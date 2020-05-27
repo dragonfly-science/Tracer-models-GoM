@@ -1,0 +1,375 @@
+---
+title: "GOM tracer pre-processing"
+output:
+  pdf_document: default
+  html_notebook: default
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, echo=F, message=FALSE, warning=FALSE}
+
+library(tidyverse)
+library(magrittr)
+library(readxl)
+library(fastinR)
+library(vegan)
+library(knitr)
+
+opts_chunk$set(warning=FALSE,message=FALSE,tidy=FALSE,fig.path='figure/', fig.align='center',dev = "pdf",fig.width=10,fig.height=8)
+options(replace.assign=TRUE,width=50)
+
+```
+
+Data are combined for easier processing.
+
+```{r data}
+
+BC    <- read_xlsx('data/CWCIII modelling workshop FASTIN R data.xlsx',sheet = 1, na = 'NA')
+Killi <- read_xlsx('data/CWCIII modelling workshop FASTIN R data.xlsx',sheet = 2, na = 'NA')
+AtlCr <- read_xlsx('data/CWCIII modelling workshop FASTIN R data.xlsx',sheet = 3, na = 'NA')
+
+pred <- bind_rows(BC, Killi, AtlCr, .id = 'Predator')
+predators <- c('Blue Crab', 'Killifish', 'Atlantic Croaker')
+pred$Predator <- predators[as.numeric(pred$Predator)]
+
+BC_prey    <- read_xlsx('data/CWCIII modelling workshop FASTIN R data.xlsx',sheet = 5, na = 'NA')
+Killi_prey <- read_xlsx('data/CWCIII modelling workshop FASTIN R data.xlsx',sheet = 6, na = 'NA')
+AtlCr_prey <- read_xlsx('data/CWCIII modelling workshop FASTIN R data.xlsx',sheet = 7, na = 'NA')
+
+prey <- bind_rows(BC_prey, Killi_prey, AtlCr_prey, .id = 'Predator')
+prey$Predator <- predators[as.numeric(prey$Predator)]
+
+SI_cols <- which(colnames(prey) %in% c('d13C', 'd15N'))
+FA_cols <- grep('[1-9]{2}_.',colnames(prey))
+
+groups <- read_xlsx('data/CWC food web groups.xlsx')
+
+PP <- bind_rows(pred, prey, .id = 'PP')
+PP$PP <- c('Pred','Prey')[as.numeric(PP$PP)]
+
+PP_SI_cols <- which(colnames(PP) %in% c('d13C', 'd15N'))
+PP_FA_cols <- grep('[1-9]{2}_.',colnames(PP))
+
+selecta <- rowSums(!is.na(PP[,PP_FA_cols]))>0 & rowSums(!is.na(PP[,PP_SI_cols]))>0
+
+PP %<>% filter(selecta)
+PP <- PP[, colSums(!is.na(PP)) == nrow(PP) | colnames(PP) %in% c('d13C', 'd15N')]
+PP <- PP[,-which(colnames(PP)=='18_2n6c')]
+FA_cols <- grep('[1-9]{2}_.',colnames(PP))
+SI_cols <- which(colnames(PP) %in% c('d13C', 'd15N'))
+
+for (i in FA_cols) PP[PP[,i]==0,i] <- 0.01;#min(PP[PP[,i]>0,i], na.rm=T)
+
+PP$Species <- gsub("0",'nd',PP$Species)
+PP$Habitat_Location <- gsub("0",'nd',PP$Habitat_Location)
+PP$Genus <- word(PP$Species)
+ss <- sapply(PP$Genus, grep, groups$`CWC species`)
+PP$IX <- unlist(lapply(ss, function(x) if (length(x) == 0) {NA} else {x}))
+PP$`EwE group` = groups$`CWC3 Ecopath Group`[PP$IX]
+
+PP %<>% mutate(`EwE group` = ifelse(!is.na(`EwE group`), `EwE group`, `Species`))
+
+```
+
+# Bluecrab analysis
+
+```{r, fig.width=12}
+
+bluecrab_cc <- read_csv('data/calibration_coefficient_summary_d84.csv')
+
+ggplot(bluecrab_cc) + 
+  geom_pointrange(aes(x=FA, y=avg_CC, ymax=avg_CC+SD_CC, ymin=avg_CC-SD_CC, col=diet)) + 
+  scale_y_log10() + 
+  cowplot::theme_cowplot() + 
+  geom_hline(yintercept = 1, linetype=3) + 
+  ylab("Conv. Coeff.") + 
+  theme(axis.text.x = element_text(angle=45,hjust=1))
+
+final_CC <- bluecrab_cc %>% 
+  mutate(FA = sub(":","_",FA),
+         FA = gsub("-","",FA),
+         FA = sub("trans","t",FA),
+         FA = sub("cis","c",FA)) %>%
+  filter(avg_diet>0.05, FA %in% colnames(PP)[FA_cols]) %>%
+  group_by(FA) %>%
+  summarise(avg_CC = weighted.mean(avg_CC, w=SD_CC),
+            SD_CC = sum(SD_CC)) %>%
+  mutate(FA = factor(FA, levels = colnames(PP)[FA_cols])) %>%
+  complete(FA, fill = list(avg_CC = 1,
+                           SD_CC  = 10))
+
+
+```
+
+```{r}
+
+PP %<>% mutate(gr_site = substr(Site,1,2))
+PP %<>% ungroup() %>% mutate(prey.ix = paste(`EwE group`)) %>% group_by(prey.ix,Predator,gr_site) %>% filter(n()>=3)
+
+get_prey <- function(Pred, Site){
+  #browser()
+  PP %>% filter(Predator == Pred,
+                PP == 'Prey') %>% 
+    group_by(prey.ix) %>%
+    mutate(keep = any(gr_site==!!Site)) %>% 
+    ungroup() %>% 
+    mutate(keep = ifelse(keep,gr_site,!!Site)) %>% 
+    filter(keep == !!Site) %>%
+    mutate(prey.ix = paste(`EwE group`,gr_site))
+}
+
+BC_PS_pred <- PP %>% filter(Predator == 'Blue Crab',
+                         PP == 'Pred',
+                         gr_site=='PS') 
+
+BC_PS_prey <- get_prey(Pred = 'Blue Crab', Site = 'PS') %>% filter(!grepl('Blue crabs',prey.ix))
+
+BC.data.PS <- add_FA(FA.predators = as.matrix(BC_PS_pred[, FA_cols]),
+                     FA.preys     = data.frame(BC_PS_prey[,c(which(colnames(PP)=='prey.ix'),FA_cols)]),
+                     CC.mean = final_CC$avg_CC,
+                     CC.var  = final_CC$SD_CC)
+
+
+BC.data.PS <- add_SI(SI.predators = as.matrix(BC_PS_pred[, SI_cols]),
+                     SI.preys     = data.frame(BC_PS_prey[,c(which(colnames(PP)=='prey.ix'),SI_cols)]),
+                     FC.mean = c(-0.5, 1),
+                     FC.var  = c(1, 1),
+                     datas=BC.data.PS)
+
+
+BC_WP_pred <- PP %>% filter(Predator == 'Blue Crab',
+                         PP == 'Pred',
+                         gr_site=='WP') 
+
+BC_WP_prey <- get_prey(Pred = 'Blue Crab', Site = 'WP') %>% filter(!grepl('Blue crabs',prey.ix))
+
+BC.data.WP <- add_FA(FA.predators = as.matrix(BC_WP_pred[, FA_cols]),
+                     FA.preys     = data.frame(BC_WP_prey[,c(which(colnames(PP)=='prey.ix'),FA_cols)]),
+                     CC.mean = final_CC$avg_CC,
+                     CC.var  = final_CC$SD_CC)
+
+
+BC.data.WP <- add_SI(SI.predators = as.matrix(BC_WP_pred[, SI_cols]),
+                     SI.preys     = data.frame(BC_WP_prey[,c(which(colnames(PP)=='prey.ix'),SI_cols)]),
+                     FC.mean = c(-0.5, 1),
+                     FC.var  = c(1, 1),
+                     datas=BC.data.WP)
+
+
+```
+
+
+
+```{r, fig.cap='Blue Crab predators  at PS sites and potential prey',echo=F}
+
+dataplot(BC.data.PS)
+
+```
+
+```{r, fig.cap='Blue Crab predators  at WPH  sites and potential prey',echo=F}
+
+dataplot(BC.data.WP)
+
+```
+
+## Model
+
+```{r model}
+
+BC.data.PS.sub <- fastinR::select_vars(BC.data.PS)
+par(mfrow=c(2,1))
+dataplot(BC.data.PS)
+dataplot(BC.data.PS.sub)
+
+BC.data.PS.mod <- run_MCMC(datas=BC.data.PS.sub,
+                           nIter=2000,
+                           nBurnin=1000,
+                           nChains=3,
+                           nThin=2,
+                           Data.Type='Combined.Analysis',
+                           Analysis.Type='Population.proportions',
+                           Rnot=0.2,plott=F,spawn=F)
+#diagnostics
+MCMCplot(BC.data.PS.mod)
+diags(BC.data.PS.mod)
+BC.data.PS.mod
+plot.pop_props(BC.data.PS.mod,save=F,types='post')
+
+
+
+BC.data.WP.sub <- fastinR::select_vars(BC.data.WP.alt)
+par(mfrow=c(2,1))
+dataplot(BC.data.WP.sub)
+dataplot(BC.data.WP.alt)
+
+
+BC.data.WP.mod <- run_MCMC(datas=BC.data.WP.sub,
+                           nIter=1000,
+                           nBurnin=500,
+                           nChains=3,
+                           nThin=2,
+                           Data.Type='Combined.Analysis',
+                           Analysis.Type='Population.proportions',
+                           Rnot=0.2,plott=F,spawn=F)
+#diagnostics
+MCMCplot(BC.data.WP.mod$res)
+diags(BC.data.WP.mod)
+BC.data.WP.mod
+plot.pop_props(BC.data.WP.mod$res,save=F,types='post')
+
+plot(BC.data.WP.mod$mod,pars='cc') + geom_vline(xintercept=qnorm(0.025,1,1), linetype=2) + geom_vline(xintercept=qnorm(0.975,1,1), linetype=2)
+
+```
+# Kilifish
+
+```{r}
+
+KF.data <- add_FA(FA.predators = as.matrix(PP[PP$Predator == 'Killifish' & 
+                                                PP$PP == 'Pred', FA_cols]),
+                  FA.preys     = data.frame(PP[PP$Predator == 'Killifish' & 
+                                                 PP$PP == 'Prey', 
+                                               c(which(colnames(PP)=='prey.ix'),FA_cols)]))
+
+
+KF.data.PS <- add_FA(FA.predators = as.matrix(PP[PP$Predator == 'Killifish' & 
+                                                   PP$PP == 'Pred' & 
+                                                   PP$gr_site=='PS', FA_cols]),
+                     FA.preys     = data.frame(PP[PP$Predator == 'Killifish' &
+                                                    PP$PP == 'Prey',
+                                                  c(which(colnames(PP)=='prey.ix'),FA_cols)]))
+
+KF.data.PS.alt <- add_FA(FA.predators = as.matrix(PP[PP$Predator == 'Killifish' & 
+                                                       PP$PP == 'Pred' & 
+                                                       PP$gr_site=='PS', FA_cols]),
+                         FA.preys     = data.frame(PP[PP$Predator == 'Killifish' &
+                                                        PP$PP == 'Prey' & 
+                                                        PP$gr_site=='PS',
+                                                      c(which(colnames(PP)=='prey.ix'),FA_cols)]))
+
+
+KF.data.WP <- add_FA(FA.predators = as.matrix(PP[PP$Predator == 'Killifish' & 
+                                                   PP$PP == 'Pred' & 
+                                                   PP$gr_site=='WP', FA_cols]),
+                     FA.preys     = data.frame(PP[PP$Predator == 'Killifish' &
+                                                    PP$PP == 'Prey',
+                                                  c(which(colnames(PP)=='prey.ix'),FA_cols)]))
+
+KF.data.WP.alt <- add_FA(FA.predators = as.matrix(PP[PP$Predator == 'Killifish' & 
+                                                       PP$PP == 'Pred' & 
+                                                       PP$gr_site=='WP', FA_cols]),
+                         FA.preys     = data.frame(PP[PP$Predator == 'Killifish' &
+                                                        PP$PP == 'Prey' & 
+                                                        PP$gr_site=='WP',
+                                                      c(which(colnames(PP)=='prey.ix'),FA_cols)]))
+
+```
+
+```{r, fig.cap='Killifish predators at all sites and potential prey across all sites',message=FALSE,warning=F,echo=F}
+dataplot(KF.data)
+```
+
+
+Similar patterns occur for Killifish between those with 18_2n6c present, and those without - this leads to some extreme patterns at WPH
+
+```{r, fig.cap='Killifish predators at PS sites and potential prey across all sites',message=FALSE,warning=F,echo=F}
+
+dataplot(KF.data.PS)
+
+```
+
+
+```{r, fig.cap='Killifish predators  at PS sites and potential prey at PS sites only',echo=F}
+
+dataplot(KF.data.PS.alt)
+
+```
+
+
+```{r, fig.cap='Killifish predators at WPH sites and potential prey across all sites',echo=F}
+
+dataplot(KF.data.WP.alt)
+
+```
+
+
+```{r}
+
+AC.data <- add_FA(FA.predators = as.matrix(PP[PP$Predator == 'Atlantic Croaker' & 
+                                                PP$PP == 'Pred', FA_cols]),
+                  FA.preys     = data.frame(PP[PP$Predator == 'Atlantic Croaker' & 
+                                                 PP$PP == 'Prey', 
+                                               c(which(colnames(PP)=='prey.ix'),FA_cols)]))
+
+
+AC.data.PS <- add_FA(FA.predators = as.matrix(PP[PP$Predator == 'Atlantic Croaker' & 
+                                                   PP$PP == 'Pred' & 
+                                                   PP$gr_site=='PS', FA_cols]),
+                     FA.preys     = data.frame(PP[PP$Predator == 'Atlantic Croaker' &
+                                                    PP$PP == 'Prey',
+                                                  c(which(colnames(PP)=='prey.ix'),FA_cols)]))
+
+AC.data.PS.alt <- add_FA(FA.predators = as.matrix(PP[PP$Predator == 'Atlantic Croaker' & 
+                                                       PP$PP == 'Pred' & 
+                                                       PP$gr_site=='PS', FA_cols]),
+                         FA.preys     = data.frame(PP[PP$Predator == 'Atlantic Croaker' &
+                                                        PP$PP == 'Prey' & 
+                                                        PP$gr_site=='PS',
+                                                      c(which(colnames(PP)=='prey.ix'),FA_cols)]))
+
+
+AC.data.WP <- add_FA(FA.predators = as.matrix(PP[PP$Predator == 'Atlantic Croaker' & 
+                                                   PP$PP == 'Pred' & 
+                                                   PP$gr_site=='WP', FA_cols]),
+                     FA.preys     = data.frame(PP[PP$Predator == 'Atlantic Croaker' &
+                                                    PP$PP == 'Prey',
+                                                  c(which(colnames(PP)=='prey.ix'),FA_cols)]))
+
+AC.data.WP.alt <- add_FA(FA.predators = as.matrix(PP[PP$Predator == 'Atlantic Croaker' & 
+                                                       PP$PP == 'Pred' & 
+                                                       PP$gr_site=='WP', FA_cols]),
+                         FA.preys     = data.frame(PP[PP$Predator == 'Atlantic Croaker' &
+                                                        PP$PP == 'Prey' & 
+                                                        PP$gr_site=='WP',
+                                                      c(which(colnames(PP)=='prey.ix'),FA_cols)]))
+
+
+
+
+```
+
+```{r, fig.cap='Atlantic Croaker predators at all sites and potential prey across all sites',message=FALSE,warning=F,echo=F}
+dataplot(AC.data)
+```
+
+
+Similar patterns occur for Atlantic Croaker between those with 18_2n6c present, and those without - this leads to some extreme patterns at WPH
+
+```{r, fig.cap='Atlantic Croaker predators at PS sites and potential prey across all sites',message=FALSE,warning=F,echo=F}
+
+dataplot(AC.data.PS)
+
+```
+
+
+```{r, fig.cap='Atlantic Croaker predators  at PS sites and potential prey at PS sites only',echo=F}
+
+dataplot(AC.data.PS.alt)
+
+```
+
+
+```{r, fig.cap='Atlantic Croaker predators at WPH sites and potential prey across all sites',echo=F}
+
+dataplot(AC.data.WP)
+
+```
+
+```{r, fig.cap='Atlantic Croaker predators at WPH sites and potential prey across all sites, dropping 18_2n6c',echo=F}
+
+dataplot(AC.data.WP.alt)
+
+```
+
+
+
