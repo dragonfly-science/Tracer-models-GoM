@@ -1,4 +1,4 @@
 docker: docker.dragonfly.co.nz/dragonverse-18.04
 publish: GoM-analysis
 memory: 6
-cpus: 6
+cpus: 4
