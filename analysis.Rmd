@@ -249,7 +249,7 @@ BCvsBC.data.WP <- add_SI(SI.predators = as.matrix(BC_WP_pred[, SI_cols]),
 
 ## Model
 
-```{r model}
+```{r model0}
 
 FAS <- which(colnames(BCvsBC.data.PS$datas.FA$preds.FA) %in% c('18_1n9c',
                                                         '18_3n3',
@@ -393,7 +393,7 @@ KF.data.WP <- add_SI(SI.predators = as.matrix(KF_WP_pred[, SI_cols]),
 
 ## Model
 
-```{r model}
+```{r model1}
 
 FAS <- which(colnames(BCvsBC.data.PS$datas.FA$preds.FA) %in% c('18_1n9c',
                                                         '18_3n3',
@@ -502,7 +502,7 @@ AC.data.WP <- add_SI(SI.predators = as.matrix(AC_WP_pred[, SI_cols]),
 
 ## Model
 
-```{r model}
+```{r model2}
 
 
 FAS <- which(colnames(AC.data.PS$datas.FA$preds.FA) %in% c('18_1n9c',
