@@ -297,7 +297,7 @@ BC.data.WP.mod <- run_MCMC(datas=BC.data.WP.sub,
                            Rnot=0.2,plott=F,spawn=F)
 #diagnostics
 MCMCplot(BC.data.WP.mod$res)
-diags(BC.data.WP.mod)
+diags(BC.data.WP.mod$res)
 BC.data.WP.mod$res
 plot.pop_props(BC.data.WP.mod$res,save=F,density = F)
 
@@ -344,7 +344,7 @@ BCvsBC.data.WP.mod <- run_MCMC(datas=BCvsBC.data.WP.sub,
                            Rnot=0.2,plott=F,spawn=F)
 #diagnostics
 MCMCplot(BCvsBC.data.WP.mod$res)
-diags(BCvsBC.data.WP.mod)
+diags(BCvsBC.data.WP.mod$res)
 BCvsBC.data.WP.mod$res
 plot.pop_props(BCvsBC.data.WP.mod$res,save=F,density = F)
 
@@ -421,7 +421,7 @@ KF.data.PS.mod <- run_MCMC(datas=KF.data.PS.sub,
 #diagnostics
 MCMCplot(KF.data.PS.mod$res)
 diags(KF.data.PS.mod$res)
-KF.data.PS.mod$resstan
+KF.data.PS.mod$res
 plot.pop_props(KF.data.PS.mod$res,save=F,density=F, type='post')
 
 
@@ -451,7 +451,7 @@ KF.data.WP.mod <- run_MCMC(datas=KF.data.WP.sub,
                            Rnot=0.2,plott=F,spawn=F)
 #diagnostics
 MCMCplot(KF.data.WP.mod$res)
-diags(KF.data.WP.mod)
+diags(KF.data.WP.mod$res)
 KF.data.WP.mod$res
 plot.pop_props(KF.data.WP.mod$res,save=F,density = F)
 
@@ -563,7 +563,7 @@ AC.data.WP.mod <- run_MCMC(datas=AC.data.WP.sub,
                            Rnot=0.2,plott=F,spawn=F)
 #diagnostics
 MCMCplot(AC.data.WP.mod$res)
-diags(AC.data.WP.mod)
+diags(AC.data.WP.mod$res)
 AC.data.WP.mod$res
 plot.pop_props(AC.data.WP.mod$res,save=F,density = F, type='post')
 
