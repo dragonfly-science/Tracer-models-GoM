@@ -40,7 +40,7 @@ AtlCr_prey <- read_xlsx('data/CWCIII modelling workshop FASTIN R data.xlsx',shee
 prey <- bind_rows(BC_prey, Killi_prey, AtlCr_prey, .id = 'Predator')
 prey$Predator <- predators[as.numeric(prey$Predator)]
 
-SI_cols <- which(colnames(prey) %in% c('d13C', 'd1N'))
+SI_cols <- which(colnames(prey) %in% c('d13C', 'd15N'))
 FA_cols <- grep('[1-9]{2}_.',colnames(prey))
 
 groups <- read_xlsx('data/CWC food web groups.xlsx')
@@ -48,16 +48,16 @@ groups <- read_xlsx('data/CWC food web groups.xlsx')
 PP <- bind_rows(pred, prey, .id = 'PP')
 PP$PP <- c('Pred','Prey')[as.numeric(PP$PP)]
 
-PP_SI_cols <- which(colnames(PP) %in% c('d13C', 'd1N'))
+PP_SI_cols <- which(colnames(PP) %in% c('d13C', 'd15N'))
 PP_FA_cols <- grep('[1-9]{2}_.',colnames(PP))
 
 selecta <- rowSums(!is.na(PP[,PP_FA_cols]))>0 & rowSums(!is.na(PP[,PP_SI_cols]))>0
 
 PP %<>% filter(selecta)
-PP <- PP[, colSums(!is.na(PP)) == nrow(PP) | colnames(PP) %in% c('d13C', 'd1N')]
+PP <- PP[, colSums(!is.na(PP)) == nrow(PP) | colnames(PP) %in% c('d13C', 'd15N')]
 PP <- PP[,-which(colnames(PP)=='18_2n6c')]
 FA_cols <- grep('[1-9]{2}_.',colnames(PP))
-SI_cols <- which(colnames(PP) %in% c('d13C', 'd1N'))
+SI_cols <- which(colnames(PP) %in% c('d13C', 'd15N'))
 
 for (i in FA_cols) PP[PP[,i]==0,i] <- 0.01;#min(PP[PP[,i]>0,i], na.rm=T)
 
