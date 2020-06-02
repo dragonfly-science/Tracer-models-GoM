@@ -40,7 +40,7 @@ AtlCr_prey <- read_xlsx('data/CWCIII modelling workshop FASTIN R data.xlsx',shee
 prey <- bind_rows(BC_prey, Killi_prey, AtlCr_prey, .id = 'Predator')
 prey$Predator <- predators[as.numeric(prey$Predator)]
 
-SI_cols <- which(colnames(prey) %in% c('d13C', 'd15N'))
+SI_cols <- which(colnames(prey) %in% c('d13C', 'd1N'))
 FA_cols <- grep('[1-9]{2}_.',colnames(prey))
 
 groups <- read_xlsx('data/CWC food web groups.xlsx')
@@ -48,16 +48,16 @@ groups <- read_xlsx('data/CWC food web groups.xlsx')
 PP <- bind_rows(pred, prey, .id = 'PP')
 PP$PP <- c('Pred','Prey')[as.numeric(PP$PP)]
 
-PP_SI_cols <- which(colnames(PP) %in% c('d13C', 'd15N'))
+PP_SI_cols <- which(colnames(PP) %in% c('d13C', 'd1N'))
 PP_FA_cols <- grep('[1-9]{2}_.',colnames(PP))
 
 selecta <- rowSums(!is.na(PP[,PP_FA_cols]))>0 & rowSums(!is.na(PP[,PP_SI_cols]))>0
 
 PP %<>% filter(selecta)
-PP <- PP[, colSums(!is.na(PP)) == nrow(PP) | colnames(PP) %in% c('d13C', 'd15N')]
+PP <- PP[, colSums(!is.na(PP)) == nrow(PP) | colnames(PP) %in% c('d13C', 'd1N')]
 PP <- PP[,-which(colnames(PP)=='18_2n6c')]
 FA_cols <- grep('[1-9]{2}_.',colnames(PP))
-SI_cols <- which(colnames(PP) %in% c('d13C', 'd15N'))
+SI_cols <- which(colnames(PP) %in% c('d13C', 'd1N'))
 
 for (i in FA_cols) PP[PP[,i]==0,i] <- 0.01;#min(PP[PP[,i]>0,i], na.rm=T)
 
@@ -251,16 +251,25 @@ BCvsBC.data.WP <- add_SI(SI.predators = as.matrix(BC_WP_pred[, SI_cols]),
 
 ```{r model}
 
-BC.data.PS.sub <- fastinR::select_vars(BC.data.PS)
+FAS <- which(colnames(BCvsBC.data.PS$datas.FA$preds.FA) %in% c('18_1n9c',
+                                                        '18_3n3',
+                                                        '22_6n3',
+                                                        '16_1n7',
+                                                        '16_0',
+                                                        '18_1n9t',
+                                                        '18_1n7',
+                                                        '18_0',
+                                                        '18_3n6'))
+BC.data.PS.sub <- fastinR::select_vars(BC.data.PS, FAS)
 par(mfrow=c(2,1))
 dataplot(BC.data.PS)
 dataplot(BC.data.PS.sub)
 
 BC.data.PS.mod <- run_MCMC(datas=BC.data.PS.sub,
-                           nIter=20000,
-                           nBurnin=5000,
-                           nChains=3,
-                           nThin=15,
+                           nIter=2000,
+                           nBurnin=500,
+                           nChains=6,
+                           nThin=1,
                            Data.Type='Combined.Analysis',
                            Analysis.Type='Population.proportions',
                            Rnot=0.2,plott=F,spawn=F)
@@ -272,17 +281,17 @@ plot.pop_props(BC.data.PS.mod$res,save=F,density=F,types = 'post')
 
 
 
-BC.data.WP.sub <- fastinR::select_vars(BC.data.WP)
+BC.data.WP.sub <- fastinR::select_vars(BC.data.WP, FAS)
 par(mfrow=c(2,1))
 dataplot(BC.data.WP.sub)
 dataplot(BC.data.WP)
 
 
 BC.data.WP.mod <- run_MCMC(datas=BC.data.WP.sub,
-                           nIter=20000,
-                           nBurnin=5000,
-                           nChains=3,
-                           nThin=15,
+                           nIter=2000,
+                           nBurnin=500,
+                           nChains=6,
+                           nThin=1,
                            Data.Type='Combined.Analysis',
                            Analysis.Type='Population.proportions',
                            Rnot=0.2,plott=F,spawn=F)
@@ -298,7 +307,7 @@ plot(BC.data.PS.mod$mod,pars='cc') + geom_vline(xintercept=qnorm(0.025,1,1), lin
 ###### Same with BC prey #########
 ##################################
 
-BCvsBC.data.PS.sub <- fastinR::select_vars(BCvsBC.data.PS)
+BCvsBC.data.PS.sub <- fastinR::select_vars(BCvsBC.data.PS, FAS)
 par(mfrow=c(2,1))
 dataplot(BCvsBC.data.PS)
 dataplot(BCvsBC.data.PS.sub)
@@ -306,8 +315,8 @@ dataplot(BCvsBC.data.PS.sub)
 BCvsBC.data.PS.mod <- run_MCMC(datas=BCvsBC.data.PS.sub,
                            nIter=2000,
                            nBurnin=500,
-                           nChains=3,
-                           nThin=15,
+                           nChains=6,
+                           nThin=1,
                            Data.Type='Combined.Analysis',
                            Analysis.Type='Population.proportions',
                            Rnot=0.2,plott=F,spawn=F)
@@ -319,17 +328,17 @@ plot.pop_props(BCvsBC.data.PS.mod$res,save=F,density=F,types = 'post')
 
 
 
-BCvsBC.data.WP.sub <- fastinR::select_vars(BCvsBC.data.WP)
+BCvsBC.data.WP.sub <- fastinR::select_vars(BCvsBC.data.WP, FAS)
 par(mfrow=c(2,1))
 dataplot(BCvsBC.data.WP.sub)
 dataplot(BCvsBC.data.WP)
 
 
 BCvsBC.data.WP.mod <- run_MCMC(datas=BCvsBC.data.WP.sub,
-                           nIter=20000,
-                           nBurnin=5000,
-                           nChains=3,
-                           nThin=15,
+                           nIter=2000,
+                           nBurnin=500,
+                           nChains=6,
+                           nThin=1,
                            Data.Type='Combined.Analysis',
                            Analysis.Type='Population.proportions',
                            Rnot=0.2,plott=F,spawn=F)
@@ -386,16 +395,26 @@ KF.data.WP <- add_SI(SI.predators = as.matrix(KF_WP_pred[, SI_cols]),
 
 ```{r model}
 
-KF.data.PS.sub <- fastinR::select_vars(KF.data.PS)
+FAS <- which(colnames(BCvsBC.data.PS$datas.FA$preds.FA) %in% c('18_1n9c',
+                                                        '18_3n3',
+                                                        '22_6n3',
+                                                        '16_1n7',
+                                                        '16_0',
+                                                        '24_1n9',
+                                                        '18_1n7',
+                                                        '18_0',
+                                                        '24_0'))
+
+KF.data.PS.sub <- fastinR::select_vars(KF.data.PS, FAS)
 par(mfrow=c(2,1))
 dataplot(KF.data.PS)
 dataplot(KF.data.PS.sub)
 
 KF.data.PS.mod <- run_MCMC(datas=KF.data.PS.sub,
-                           nIter=20000,
-                           nBurnin=5000,
-                           nChains=3,
-                           nThin=15,
+                           nIter=2000,
+                           nBurnin=500,
+                           nChains=6,
+                           nThin=1,
                            Data.Type='Combined.Analysis',
                            Analysis.Type='Population.proportions',
                            Rnot=0.2,plott=F,spawn=F)
@@ -406,18 +425,27 @@ KF.data.PS.mod$resstan
 plot.pop_props(KF.data.PS.mod$res,save=F,density=F, type='post')
 
 
+FAS <- which(colnames(BCvsBC.data.PS$datas.FA$preds.FA) %in% c('18_1n9c',
+                                                        '18_3n3',
+                                                        '22_6n3',
+                                                        '16_1n7',
+                                                        '16_0',
+                                                        '17_0',
+                                                        '18_1n7',
+                                                        '18_0',
+                                                        '24_0'))
 
-KF.data.WP.sub <- fastinR::select_vars(KF.data.WP)
+KF.data.WP.sub <- fastinR::select_vars(KF.data.WP, FAS)
 par(mfrow=c(2,1))
 dataplot(KF.data.WP.sub)
 dataplot(KF.data.WP)
 
 
 KF.data.WP.mod <- run_MCMC(datas=KF.data.WP.sub,
-                           nIter=20000,
-                           nBurnin=5000,
-                           nChains=3,
-                           nThin=15,
+                           nIter=2000,
+                           nBurnin=500,
+                           nChains=6,
+                           nThin=1,
                            Data.Type='Combined.Analysis',
                            Analysis.Type='Population.proportions',
                            Rnot=0.2,plott=F,spawn=F)
@@ -440,7 +468,9 @@ AC_PS_pred <- PP %>% filter(Predator == 'Atlantic Croaker',
 AC_PS_prey <- get_prey(Pred = 'Atlantic Croaker', Site = 'PS') 
 
 AC.data.PS <- add_FA(FA.predators = as.matrix(AC_PS_pred[, FA_cols]),
-                     FA.preys     = data.frame(AC_PS_prey[,c(which(colnames(PP)=='prey.ix'),FA_cols)]))
+                     FA.preys     = data.frame(AC_PS_prey[,c(which(colnames(PP)=='prey.ix'),FA_cols)]),
+                     CC.mean = cc_list$`Atlantic croaker`$avg_CC,
+                     CC.var  = cc_list$`Atlantic croaker`$SD_CC)
 
 
 AC.data.PS <- add_SI(SI.predators = as.matrix(AC_PS_pred[, SI_cols]),
@@ -457,7 +487,9 @@ AC_WP_pred <- PP %>% filter(Predator == 'Atlantic Croaker',
 AC_WP_prey <- get_prey(Pred = 'Atlantic Croaker', Site = 'WP')
 
 AC.data.WP <- add_FA(FA.predators = as.matrix(AC_WP_pred[, FA_cols]),
-                     FA.preys     = data.frame(AC_WP_prey[,c(which(colnames(PP)=='prey.ix'),FA_cols)]))
+                     FA.preys     = data.frame(AC_WP_prey[,c(which(colnames(PP)=='prey.ix'),FA_cols)]),
+                     CC.mean = cc_list$`Atlantic croaker`$avg_CC,
+                     CC.var  = cc_list$`Atlantic croaker`$SD_CC)
 
 
 AC.data.WP <- add_SI(SI.predators = as.matrix(AC_WP_pred[, SI_cols]),
@@ -472,16 +504,29 @@ AC.data.WP <- add_SI(SI.predators = as.matrix(AC_WP_pred[, SI_cols]),
 
 ```{r model}
 
-AC.data.PS.sub <- fastinR::select_vars(AC.data.PS)
+
+FAS <- which(colnames(AC.data.PS$datas.FA$preds.FA) %in% c('18_1n9c',
+                                                        '22_0',
+                                                        '22_6n3',
+                                                        '16_1n7',
+                                                        '16_0',
+                                                        '17_0',
+                                                        '18_1n7',
+                                                        '18_0',
+                                                        '24_0',
+                                                        '22_0',
+                                                        '18_1n9t'))
+
+AC.data.PS.sub <- fastinR::select_vars(AC.data.PS, FAS)
 par(mfrow=c(2,1))
 dataplot(AC.data.PS)
 dataplot(AC.data.PS.sub)
 
 AC.data.PS.mod <- run_MCMC(datas=AC.data.PS.sub,
-                           nIter=20000,
-                           nBurnin=5000,
-                           nChains=3,
-                           nThin=15,
+                           nIter=2000,
+                           nBurnin=500,
+                           nChains=6,
+                           nThin=1,
                            Data.Type='Combined.Analysis',
                            Analysis.Type='Population.proportions',
                            Rnot=0.2,plott=F,spawn=F)
@@ -493,17 +538,26 @@ plot.pop_props(AC.data.PS.mod$res,save=F,density=F, type='post')
 
 
 
-AC.data.WP.sub <- fastinR::select_vars(AC.data.WP)
+FAS <- which(colnames(BCvsBC.data.PS$datas.FA$preds.FA) %in% c('18_1n9c',
+                                                        '22_0',
+                                                        '22_6n3',
+                                                        '16_1n7',
+                                                        '16_0',
+                                                        '17_0',
+                                                        '18_0',
+                                                        '24_0'))
+
+AC.data.WP.sub <- fastinR::select_vars(AC.data.WP, FAS)
 par(mfrow=c(2,1))
 dataplot(AC.data.WP.sub)
 dataplot(AC.data.WP)
 
 
 AC.data.WP.mod <- run_MCMC(datas=AC.data.WP.sub,
-                           nIter=20000,
-                           nBurnin=5000,
-                           nChains=3,
-                           nThin=15,
+                           nIter=2000,
+                           nBurnin=500,
+                           nChains=6,
+                           nThin=1,
                            Data.Type='Combined.Analysis',
                            Analysis.Type='Population.proportions',
                            Rnot=0.2,plott=F,spawn=F)
