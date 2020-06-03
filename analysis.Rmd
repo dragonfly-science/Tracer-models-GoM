@@ -551,7 +551,7 @@ modlist <- list('Blue crab PS' = list(mod  = BC.data.PS.mod$mod,
                                       prey = AC.data.WP.mod$res$prey.names))
 
 out <- lapply(modlist, function(l) {
-  props <- extract(l$mod,pars='prop')$prop
+  props <- rstan::extract(l$mod,pars='prop')$prop
   colnames(props) <- l$prey
 reshape2::melt(props)
 }) %>% bind_rows(.id = 'Species')
