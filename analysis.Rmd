@@ -176,6 +176,19 @@ get_prey <- function(Pred, Site){
     arrange(prey.ix)
 }
 
+
+FA_args <- list(nIter=2000,
+                nBurnin=500,
+                nChains=4,
+                nThin=1,
+                Data.Type='Combined.Analysis',
+                Analysis.Type='Population.proportions',
+                Rnot=0.2,plott=F,spawn=F)
+
+```
+
+```{r}
+
 BC_PS_pred <- PP %>% filter(Predator == 'Blue Crab',
                          PP == 'Pred',
                          gr_site=='PS') 
@@ -265,14 +278,8 @@ par(mfrow=c(2,1))
 dataplot(BC.data.PS)
 dataplot(BC.data.PS.sub)
 
-BC.data.PS.mod <- run_MCMC(datas=BC.data.PS.sub,
-                           nIter=2000,
-                           nBurnin=500,
-                           nChains=4,
-                           nThin=1,
-                           Data.Type='Combined.Analysis',
-                           Analysis.Type='Population.proportions',
-                           Rnot=0.2,plott=F,spawn=F)
+FA_args$datas <- BC.data.PS.sub
+BC.data.PS.mod <- brms:::eval_silent(do.call(run_MCMC, FA_args), type='message')
 #diagnostics
 MCMCplot(BC.data.PS.mod$res)
 diags(BC.data.PS.mod$res)
@@ -287,14 +294,8 @@ dataplot(BC.data.WP.sub)
 dataplot(BC.data.WP)
 
 
-BC.data.WP.mod <- run_MCMC(datas=BC.data.WP.sub,
-                           nIter=2000,
-                           nBurnin=500,
-                           nChains=4,
-                           nThin=1,
-                           Data.Type='Combined.Analysis',
-                           Analysis.Type='Population.proportions',
-                           Rnot=0.2,plott=F,spawn=F)
+FA_args$datas <- BC.data.WP.sub
+BC.data.WP.mod <- brms:::eval_silent(do.call(run_MCMC, FA_args), type='message')
 #diagnostics
 MCMCplot(BC.data.WP.mod$res)
 diags(BC.data.WP.mod$res)
@@ -312,14 +313,8 @@ par(mfrow=c(2,1))
 dataplot(BCvsBC.data.PS)
 dataplot(BCvsBC.data.PS.sub)
 
-BCvsBC.data.PS.mod <- run_MCMC(datas=BCvsBC.data.PS.sub,
-                           nIter=2000,
-                           nBurnin=500,
-                           nChains=4,
-                           nThin=1,
-                           Data.Type='Combined.Analysis',
-                           Analysis.Type='Population.proportions',
-                           Rnot=0.2,plott=F,spawn=F)
+FA_args$datas <- BCvsBC.data.PS.sub
+BCvsBC.data.PS.mod <- brms:::eval_silent(do.call(run_MCMC, FA_args), type='message')
 #diagnostics
 MCMCplot(BCvsBC.data.PS.mod$res)
 diags(BCvsBC.data.PS.mod$res)
@@ -333,15 +328,8 @@ par(mfrow=c(2,1))
 dataplot(BCvsBC.data.WP.sub)
 dataplot(BCvsBC.data.WP)
 
-
-BCvsBC.data.WP.mod <- run_MCMC(datas=BCvsBC.data.WP.sub,
-                           nIter=2000,
-                           nBurnin=500,
-                           nChains=4,
-                           nThin=1,
-                           Data.Type='Combined.Analysis',
-                           Analysis.Type='Population.proportions',
-                           Rnot=0.2,plott=F,spawn=F)
+FA_args$datas <- BCvsBC.data.WP.sub
+BCvsBC.data.WP.mod <- brms:::eval_silent(do.call(run_MCMC, FA_args), type='message')
 #diagnostics
 MCMCplot(BCvsBC.data.WP.mod$res)
 diags(BCvsBC.data.WP.mod$res)
@@ -410,14 +398,9 @@ par(mfrow=c(2,1))
 dataplot(KF.data.PS)
 dataplot(KF.data.PS.sub)
 
-KF.data.PS.mod <- run_MCMC(datas=KF.data.PS.sub,
-                           nIter=2000,
-                           nBurnin=500,
-                           nChains=4,
-                           nThin=1,
-                           Data.Type='Combined.Analysis',
-                           Analysis.Type='Population.proportions',
-                           Rnot=0.2,plott=F,spawn=F)
+FA_args$datas <- KF.data.PS.sub
+
+KF.data.PS.mod <- brms:::eval_silent(do.call(run_MCMC, FA_args), type='message')
 #diagnostics
 MCMCplot(KF.data.PS.mod$res)
 diags(KF.data.PS.mod$res)
@@ -440,15 +423,9 @@ par(mfrow=c(2,1))
 dataplot(KF.data.WP.sub)
 dataplot(KF.data.WP)
 
+FA_args$datas <- KF.data.WP.sub
 
-KF.data.WP.mod <- run_MCMC(datas=KF.data.WP.sub,
-                           nIter=2000,
-                           nBurnin=500,
-                           nChains=4,
-                           nThin=1,
-                           Data.Type='Combined.Analysis',
-                           Analysis.Type='Population.proportions',
-                           Rnot=0.2,plott=F,spawn=F)
+KF.data.WP.mod <- brms:::eval_silent(do.call(run_MCMC, FA_args), type='message')
 #diagnostics
 MCMCplot(KF.data.WP.mod$res)
 diags(KF.data.WP.mod$res)
@@ -522,14 +499,9 @@ par(mfrow=c(2,1))
 dataplot(AC.data.PS)
 dataplot(AC.data.PS.sub)
 
-AC.data.PS.mod <- run_MCMC(datas=AC.data.PS.sub,
-                           nIter=2000,
-                           nBurnin=500,
-                           nChains=4,
-                           nThin=1,
-                           Data.Type='Combined.Analysis',
-                           Analysis.Type='Population.proportions',
-                           Rnot=0.2,plott=F,spawn=F)
+FA_args$datas <- AC.data.PS.sub
+
+AC.data.PS.mod <- brms:::eval_silent(do.call(run_MCMC, FA_args), type='message')
 #diagnostics
 MCMCplot(AC.data.PS.mod$res)
 diags(AC.data.PS.mod$res)
@@ -552,15 +524,9 @@ par(mfrow=c(2,1))
 dataplot(AC.data.WP.sub)
 dataplot(AC.data.WP)
 
+FA_args$datas <- AC.data.WP.sub
 
-AC.data.WP.mod <- run_MCMC(datas=AC.data.WP.sub,
-                           nIter=2000,
-                           nBurnin=500,
-                           nChains=4,
-                           nThin=1,
-                           Data.Type='Combined.Analysis',
-                           Analysis.Type='Population.proportions',
-                           Rnot=0.2,plott=F,spawn=F)
+AC.data.WP.mod <-  brms:::eval_silent(do.call(run_MCMC, FA_args), type='message')
 #diagnostics
 MCMCplot(AC.data.WP.mod$res)
 diags(AC.data.WP.mod$res)
