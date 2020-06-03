@@ -580,3 +580,45 @@ ggplot(out) +
 
 ```
 
+
+```{r}
+
+modlist <- list('Blue crab PS - no BC prey' = list(mod  = BC.data.PS.mod$mod,
+                                                   prey = BC.data.PS.mod$res$prey.names),
+                'Blue crab WPH - no BC prey' = list(mod  = BC.data.WP.mod$mod,
+                                                    prey = BC.data.WP.mod$res$prey.names),
+                'Blue crab PS - with BC prey' = list(mod  = BCvsBC.data.PS.mod$mod,
+                                                     prey = BCvsBC.data.PS.mod$res$prey.names),
+                'Blue crab WPH - with BC prey' = list(mod  = BCvsBC.data.WP.mod$mod,
+                                                      prey = BCvsBC.data.WP.mod$res$prey.names))
+
+out <- lapply(modlist, function(l) {
+  props <- rstan::extract(l$mod,pars='prop')$prop
+  colnames(props) <- l$prey
+reshape2::melt(props)
+}) %>% bind_rows(.id = 'Species')
+
+colnames(out)[2:3] <- c('iter', 'Prey')
+
+out %<>% 
+  mutate(Prey = gsub(' PS','',Prey),
+         Prey = gsub(' WP','',Prey)) %>%
+  group_by(Species, Prey) %>%
+  summarise(m = mean(value),
+            q11 = quantile(value, 0.025),
+            q1 = quantile(value, 0.1),
+            q3 = quantile(value, 0.9),
+            q33 = quantile(value, 0.975))
+
+ggplot(out) +
+  geom_pointrange(aes(x=Prey, y=m, ymin=q11, ymax=q33, col=Prey), size=0.5) + 
+  geom_linerange(aes(x=Prey, y=m, ymin=q1, ymax=q3, col=Prey), size=1) + 
+  facet_wrap(~Species, ncol = 2, scales = 'free_y') + 
+  coord_flip() + 
+  cowplot::theme_cowplot() + 
+  scale_color_discrete(guide='none') + 
+  ylab('Prey proportion') +
+  theme(axis.text.y = element_text(size=8))
+
+```
+
