@@ -1,8 +1,9 @@
 ---
 title: "GOM tracer pre-processing"
 output:
-  html_document:
+  html_document: 
     code_fold: hide
+    toc: yes
 ---
 
 ```{r setup, echo=F, message=FALSE, warning=FALSE}
@@ -19,7 +20,7 @@ opts_chunk$set(warning=FALSE,message=FALSE,tidy=FALSE,fig.width = 12,fig.height=
 
 ```
 
-Data are combined for easier processing.
+# Pre-processing
 
 ```{r data}
 
@@ -96,13 +97,13 @@ final_CC <- bluecrab_cc %>%
   mutate(FAL = any(grepl(FA, colnames(PP)[FA_cols]))) %>%
   filter(avg_diet>0.05, FAL) %>%
   mutate(FAS = grep(FA, colnames(PP)[FA_cols],value = T)) %>%
-  group_by(FAS) %>%
+  group_by(FAS[1:7]) %>%
   summarise(avg_CC = weighted.mean(avg_CC, w=SD_CC),
             SD_CC = mean(SD_CC)) %>%
   mutate(FA = factor(FAS, levels = colnames(PP)[FA_cols])) %>%
   complete(FA, fill = list(avg_CC = 1,
                            SD_CC  = 2)) %>%
-  select(-FAS)
+  select(-FAS[1:7])
 
 
 ggplot(final_CC) + 
@@ -154,7 +155,11 @@ bind_rows(cc_list, .id = 'Predator') %>%
   ylab("Conv. Coeff.") + 
   theme(axis.text.x = element_text(angle=45,hjust=1))
 
+
+
 ```
+
+# Model setup
 
 ```{r}
 
@@ -176,14 +181,16 @@ get_prey <- function(Pred, Site){
 
 
 FA_args <- list(nIter=2000,
-                nBurnin=500,
-                nChains=4,
-                nThin=1,
+                nBurnin=1000,
+                nChains=3,
+                nThin=5,
                 Data.Type='Combined.Analysis',
                 Analysis.Type='Population.proportions',
                 Rnot=0.2,plott=F,spawn=F)
 
 ```
+
+# Blue crab
 
 ```{r}
 
@@ -259,6 +266,7 @@ BCvsBC.data.WP <- add_SI(SI.predators = as.matrix(BC_WP_pred[, SI_cols]),
 ```
 
 ## Model
+### Blue crab PS
 
 ```{r model0}
 
@@ -271,7 +279,7 @@ FAS <- which(colnames(BCvsBC.data.PS$datas.FA$preds.FA) %in% c('18_1n9c',
                                                         '18_1n7',
                                                         '18_0',
                                                         '18_3n6'))
-BC.data.PS.sub <- fastinR::select_vars(BC.data.PS, FAS)
+BC.data.PS.sub <- fastinR::select_vars(BC.data.PS, FAS[1:7])
 par(mfrow=c(2,1))
 dataplot(BC.data.PS)
 dataplot(BC.data.PS.sub)
@@ -284,9 +292,13 @@ diags(BC.data.PS.mod$res)
 BC.data.PS.mod$res
 plot.pop_props(BC.data.PS.mod$res,save=F,density=F,types = 'post')
 
+```
 
+### Blue crab WP
 
-BC.data.WP.sub <- fastinR::select_vars(BC.data.WP, FAS)
+```{r}
+
+BC.data.WP.sub <- fastinR::select_vars(BC.data.WP, FAS[1:7])
 par(mfrow=c(2,1))
 dataplot(BC.data.WP.sub)
 dataplot(BC.data.WP)
@@ -301,12 +313,15 @@ BC.data.WP.mod$res
 plot.pop_props(BC.data.WP.mod$res,save=F,density = F)
 
 plot(BC.data.PS.mod$mod,pars='cc') + geom_vline(xintercept=qnorm(0.025,1,1), linetype=2) + geom_vline(xintercept=qnorm(0.975,1,1), linetype=2)
+```
 
+### Blue crab PS with BC prey
+```{r}
 ##################################
 ###### Same with BC prey #########
 ##################################
 
-BCvsBC.data.PS.sub <- fastinR::select_vars(BCvsBC.data.PS, FAS)
+BCvsBC.data.PS.sub <- fastinR::select_vars(BCvsBC.data.PS, FAS[1:7])
 par(mfrow=c(2,1))
 dataplot(BCvsBC.data.PS)
 dataplot(BCvsBC.data.PS.sub)
@@ -319,9 +334,13 @@ diags(BCvsBC.data.PS.mod$res)
 BCvsBC.data.PS.mod$res
 plot.pop_props(BCvsBC.data.PS.mod$res,save=F,density=F,types = 'post')
 
+```
 
+### Blue crab WP with BC prey
 
-BCvsBC.data.WP.sub <- fastinR::select_vars(BCvsBC.data.WP, FAS)
+```{r}
+
+BCvsBC.data.WP.sub <- fastinR::select_vars(BCvsBC.data.WP, FAS[1:7])
 par(mfrow=c(2,1))
 dataplot(BCvsBC.data.WP.sub)
 dataplot(BCvsBC.data.WP)
@@ -338,6 +357,7 @@ plot(BCvsBC.data.PS.mod$mod,pars='cc') + geom_vline(xintercept=qnorm(0.025,1,1),
 
 
 ```
+
 # Killifish
 
 ```{r}
@@ -378,7 +398,7 @@ KF.data.WP <- add_SI(SI.predators = as.matrix(KF_WP_pred[, SI_cols]),
 ```
 
 ## Model
-
+### Killifish PS
 ```{r model1}
 
 FAS <- which(colnames(BCvsBC.data.PS$datas.FA$preds.FA) %in% c('18_1n9c',
@@ -391,7 +411,7 @@ FAS <- which(colnames(BCvsBC.data.PS$datas.FA$preds.FA) %in% c('18_1n9c',
                                                         '18_0',
                                                         '24_0'))
 
-KF.data.PS.sub <- fastinR::select_vars(KF.data.PS, FAS)
+KF.data.PS.sub <- fastinR::select_vars(KF.data.PS, FAS[1:7])
 par(mfrow=c(2,1))
 dataplot(KF.data.PS)
 dataplot(KF.data.PS.sub)
@@ -405,7 +425,11 @@ diags(KF.data.PS.mod$res)
 KF.data.PS.mod$res
 plot.pop_props(KF.data.PS.mod$res,save=F,density=F, type='post')
 
+```
 
+### Killifish WP
+
+```{r}
 FAS <- which(colnames(BCvsBC.data.PS$datas.FA$preds.FA) %in% c('18_1n9c',
                                                         '18_3n3',
                                                         '22_6n3',
@@ -416,7 +440,7 @@ FAS <- which(colnames(BCvsBC.data.PS$datas.FA$preds.FA) %in% c('18_1n9c',
                                                         '18_0',
                                                         '24_0'))
 
-KF.data.WP.sub <- fastinR::select_vars(KF.data.WP, FAS)
+KF.data.WP.sub <- fastinR::select_vars(KF.data.WP, FAS[1:7])
 par(mfrow=c(2,1))
 dataplot(KF.data.WP.sub)
 dataplot(KF.data.WP)
@@ -475,8 +499,8 @@ AC.data.WP <- add_SI(SI.predators = as.matrix(AC_WP_pred[, SI_cols]),
 
 ```
 
-## Model
-
+## Atlantic Croaker Model
+### Atlantic Croaker PS
 ```{r model2}
 
 
@@ -492,7 +516,7 @@ FAS <- which(colnames(AC.data.PS$datas.FA$preds.FA) %in% c('18_1n9c',
                                                         '22_0',
                                                         '18_1n9t'))
 
-AC.data.PS.sub <- fastinR::select_vars(AC.data.PS, FAS)
+AC.data.PS.sub <- fastinR::select_vars(AC.data.PS, FAS[1:7])
 par(mfrow=c(2,1))
 dataplot(AC.data.PS)
 dataplot(AC.data.PS.sub)
@@ -506,6 +530,11 @@ diags(AC.data.PS.mod$res)
 AC.data.PS.mod$res
 plot.pop_props(AC.data.PS.mod$res,save=F,density=F, type='post')
 
+```
+
+
+### Atlantic Croaker WP
+```{r}
 
 
 FAS <- which(colnames(BCvsBC.data.PS$datas.FA$preds.FA) %in% c('18_1n9c',
@@ -517,7 +546,7 @@ FAS <- which(colnames(BCvsBC.data.PS$datas.FA$preds.FA) %in% c('18_1n9c',
                                                         '18_0',
                                                         '24_0'))
 
-AC.data.WP.sub <- fastinR::select_vars(AC.data.WP, FAS)
+AC.data.WP.sub <- fastinR::select_vars(AC.data.WP, FAS[1:7])
 par(mfrow=c(2,1))
 dataplot(AC.data.WP.sub)
 dataplot(AC.data.WP)
