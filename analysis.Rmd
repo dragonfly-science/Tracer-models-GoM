@@ -14,7 +14,7 @@ library(fastinR)
 library(vegan)
 library(knitr)
 
-opts_chunk$set(warning=FALSE,message=FALSE,tidy=FALSE,fig.width = 12,fig.height=8)
+opts_chunk$set(warning=FALSE,message=FALSE,tidy=FALSE,fig.width = 12,fig.height=8,dpi = 300)
 #options(replace.assign=TRUE,width=50)
 
 ```
