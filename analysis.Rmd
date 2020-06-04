@@ -97,13 +97,13 @@ final_CC <- bluecrab_cc %>%
   mutate(FAL = any(grepl(FA, colnames(PP)[FA_cols]))) %>%
   filter(avg_diet>0.05, FAL) %>%
   mutate(FAS = grep(FA, colnames(PP)[FA_cols],value = T)) %>%
-  group_by(FAS[1:7]) %>%
+  group_by(FAS) %>%
   summarise(avg_CC = weighted.mean(avg_CC, w=SD_CC),
             SD_CC = mean(SD_CC)) %>%
   mutate(FA = factor(FAS, levels = colnames(PP)[FA_cols])) %>%
   complete(FA, fill = list(avg_CC = 1,
                            SD_CC  = 2)) %>%
-  select(-FAS[1:7])
+  select(-FAS)
 
 
 ggplot(final_CC) + 
