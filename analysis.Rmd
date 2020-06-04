@@ -4,6 +4,7 @@ output:
   html_document: 
     code_fold: hide
     toc: yes
+    toc_float: true
 ---
 
 ```{r setup, echo=F, message=FALSE, warning=FALSE}
