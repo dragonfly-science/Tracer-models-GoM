@@ -280,7 +280,7 @@ FAS <- which(colnames(BCvsBC.data.PS$datas.FA$preds.FA) %in% c('18_1n9c',
                                                         '18_1n7',
                                                         '18_0',
                                                         '18_3n6'))
-BC.data.PS.sub <- fastinR::select_vars(BC.data.PS, FAS[1:7])
+BC.data.PS.sub <- fastinR::select_vars(BC.data.PS, FAS[1:6])
 par(mfrow=c(2,1))
 dataplot(BC.data.PS)
 dataplot(BC.data.PS.sub)
