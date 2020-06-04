@@ -15,7 +15,7 @@ library(fastinR)
 library(vegan)
 library(knitr)
 
-opts_chunk$set(warning=FALSE,message=FALSE,tidy=FALSE,fig.width = 12,fig.height=8,dpi = 300)
+opts_chunk$set(warning=FALSE,message=FALSE,tidy=FALSE,fig.width = 12,fig.height=8,dpi = 150)
 #options(replace.assign=TRUE,width=50)
 
 ```
@@ -180,10 +180,10 @@ get_prey <- function(Pred, Site){
 }
 
 
-FA_args <- list(nIter=2000,
+FA_args <- list(nIter=21000,
                 nBurnin=1000,
-                nChains=3,
-                nThin=5,
+                nChains=8,
+                nThin=40,
                 Data.Type='Combined.Analysis',
                 Analysis.Type='Population.proportions',
                 Rnot=0.2,plott=F,spawn=F)
@@ -640,7 +640,7 @@ out %<>%
 ggplot(out) +
   geom_pointrange(aes(x=Prey, y=m, ymin=q11, ymax=q33, col=Prey), size=0.5) +
   geom_linerange(aes(x=Prey, y=m, ymin=q1, ymax=q3, col=Prey), size=1) +
-  facet_wrap(~Species, ncol = 2, scales = 'free_y') +
+  facet_wrap(~Species, ncol = 2) +
   coord_flip() +
   cowplot::theme_cowplot() +
   scale_color_discrete(guide='none') +
