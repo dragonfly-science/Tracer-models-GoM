@@ -181,7 +181,7 @@ get_prey <- function(Pred, Site){
 }
 
 
-FA_args <- list(nIter=11000,
+FA_args <- list(nIter=6000,
                 nBurnin=1000,
                 nChains=8,
                 nThin=20,
