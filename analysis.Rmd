@@ -439,7 +439,7 @@ plot.pop_props(KF.data.PS.mod$res,save=F,density=F, type='post')
 ### Killifish WP
 
 ```{r}
-FAS <- which(colnames(KF.data.PS$preds.FA) %in% c('18_1n9c',
+FAS <- which(colnames(KF.data.WP$datas.FA$preds.FA) %in% c('18_1n9c',
                                                   '18_3n3',
                                                   '22_6n3',
                                                   '16_1n7',
