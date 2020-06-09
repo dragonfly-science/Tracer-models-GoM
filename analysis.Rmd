@@ -419,8 +419,9 @@ FAS <- which(colnames(KF.data.PS$datas.FA$preds.FA) %in% c('18_1n9c',
                                                                '18_1n7',
                                                                '18_3n3',
                                                                '18_0',
-                                                               '24_0',
-                                                               '24_1n9'))
+                                                               #'24_0',
+                                                               #'24_1n9'
+                                                           ))
                                                                
 KF.data.PS.sub <- fastinR::select_vars(KF.data.PS, FAS)
 par(mfrow=c(2,1))
@@ -445,10 +446,11 @@ FAS <- which(colnames(KF.data.WP$datas.FA$preds.FA) %in% c('18_1n9c',
                                                   '18_3n3',
                                                   '22_6n3',
                                                   '16_1n7',
-                                                  '16_0',
                                                   '18_1n7',
                                                   '18_0',
-                                                  '24_0'))
+                                                  '24_0',
+                                                  #'16_0'
+                                                  ))
 
 KF.data.WP.sub <- fastinR::select_vars(KF.data.WP, FAS)
 par(mfrow=c(2,1))
