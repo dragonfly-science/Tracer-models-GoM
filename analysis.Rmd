@@ -418,7 +418,7 @@ FAS <- which(colnames(KF.data.PS$datas.FA$preds.FA) %in% c('18_1n9c',
                                                                '16_0',
                                                                '18_1n7',
                                                                '18_3n3',
-                                                               '18_0',
+                                                               '18_0'#,
                                                                #'24_0',
                                                                #'24_1n9'
                                                            ))
@@ -448,7 +448,7 @@ FAS <- which(colnames(KF.data.WP$datas.FA$preds.FA) %in% c('18_1n9c',
                                                   '16_1n7',
                                                   '18_1n7',
                                                   '18_0',
-                                                  '24_0',
+                                                  '24_0'#,
                                                   #'16_0'
                                                   ))
 
@@ -521,7 +521,7 @@ FAS <- which(colnames(AC.data.PS$datas.FA$preds.FA) %in% c('18_1n9c',
                                                         '24_0',
                                                         '16_0',
                                                         #'18_1n7',
-                                                        '18_0',
+                                                        '18_0'#,
                                                         #'16_1n7',
                                                         #'22_0',
                                                         #'18_1n9t'
