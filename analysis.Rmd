@@ -165,7 +165,7 @@ bind_rows(cc_list, .id = 'Predator') %>%
 ```{r}
 
 PP %<>% mutate(gr_site = substr(Site,1,2))
-PP %<>% ungroup() %>% mutate(prey.ix = paste(`EwE group`)) %>% group_by(PP,Predator,prey.ix,gr_site) %>% filter(PP=='Pred' | (PP=='Prey' & n()>=5))
+PP %<>% ungroup() %>% mutate(prey.ix = paste(`EwE group`)) %>% group_by(PP,Predator,prey.ix,gr_site) %>% filter(PP=='Pred' | (PP=='Prey' & n()>5))
 
 get_prey <- function(Pred, Site){
   #browser()
@@ -280,6 +280,7 @@ FAS_BC_PS <- which(colnames(BCvsBC.data.PS$datas.FA$preds.FA) %in% c('18_1n9c',
                                                         '18_1n7',
                                                         '18_0',
                                                         '18_3n6'))
+
 BC.data.PS.sub <- fastinR::select_vars(BC.data.PS, FAS_BC_PS)
 par(mfrow=c(2,1))
 dataplot(BC.data.PS)
@@ -305,7 +306,8 @@ FAS_BC_WP <- which(colnames(BCvsBC.data.WP$datas.FA$preds.FA) %in% c('18_1n9c',
                                                         '16_1n7',
                                                         '16_0',
                                                         '18_1n9t',
-                                                        '18_0'))
+                                                        '18_0',
+                                                        '18_3n6'))
 
 BC.data.WP.sub <- fastinR::select_vars(BC.data.WP, FAS_BC_WP)
 par(mfrow=c(2,1))
@@ -514,11 +516,14 @@ AC.data.WP <- add_SI(SI.predators = as.matrix(AC_WP_pred[, SI_cols]),
 
 FAS <- which(colnames(AC.data.PS$datas.FA$preds.FA) %in% c('18_1n9c',
                                                         '22_6n3',
-                                                        '16_1n7',
+                                                        '24_0',
                                                         '16_0',
-                                                        '18_1n7',
+                                                        #'18_1n7',
                                                         '18_0',
-                                                        '24_0'))
+                                                        #'16_1n7',
+                                                        #'22_0',
+                                                        #'18_1n9t'
+                                                        ))
 
 AC.data.PS.sub <- fastinR::select_vars(AC.data.PS, FAS)
 par(mfrow=c(2,1))
@@ -542,14 +547,15 @@ plot.pop_props(AC.data.PS.mod$res,save=F,density=F, type='post')
 
 
 FAS <- which(colnames(AC.data.WP$datas.FA$preds.FA) %in% c('18_1n9c',
-                                                        '22_0',
+                                                        '24_0',
                                                         '22_6n3',
                                                         '16_1n7',
-                                                        '16_0',
-                                                        '17_0',
-                                                        '18_0',
-                                                        '24_0',
-                                                        '18_1n9t'))
+                                                        '16_0'#,
+                                                        #'17_0',
+                                                        #'18_0',
+                                                        #'22_0',
+                                                        #'18_1n9t'
+                                                        ))
 
 AC.data.WP.sub <- fastinR::select_vars(AC.data.WP, FAS)
 par(mfrow=c(2,1))
