@@ -181,10 +181,10 @@ get_prey <- function(Pred, Site){
 }
 
 
-FA_args <- list(nIter=6000,
-                nBurnin=1000,
+FA_args <- list(nIter=25000,
+                nBurnin=5000,
                 nChains=8,
-                nThin=20,
+                nThin=80,
                 Data.Type='Combined.Analysis',
                 Analysis.Type='Population.proportions',
                 Rnot=0.2,plott=F,spawn=F)
@@ -281,7 +281,7 @@ FAS_BC_PS <- which(colnames(BCvsBC.data.PS$datas.FA$preds.FA) %in% c('18_1n9c',
                                                                      '18_0',
                                                                      '18_3n6'))
 
-BC.data.PS.sub <- fastinR::select_vars(BC.data.PS, FAS_BC_PS[1:6])
+BC.data.PS.sub <- fastinR::select_vars(BC.data.PS, FAS_BC_PS)
 par(mfrow=c(2,1))
 dataplot(BC.data.PS)
 dataplot(BC.data.PS.sub)
@@ -308,7 +308,7 @@ FAS_BC_WP <- which(colnames(BCvsBC.data.WP$datas.FA$preds.FA) %in% c('18_1n9c',
                                                                      '18_1n9t',
                                                                      '18_1n7'))
 
-BC.data.WP.sub <- fastinR::select_vars(BC.data.WP, FAS_BC_WP[1:6])
+BC.data.WP.sub <- fastinR::select_vars(BC.data.WP, FAS_BC_WP)
 par(mfrow=c(2,1))
 dataplot(BC.data.WP.sub)
 dataplot(BC.data.WP)
@@ -331,7 +331,7 @@ plot(BC.data.PS.mod$mod,pars='cc') + geom_vline(xintercept=qnorm(0.025,1,1), lin
 ###### Same with BC prey #########
 ##################################
 
-BCvsBC.data.PS.sub <- fastinR::select_vars(BCvsBC.data.PS, FAS_BC_PS[1:6])
+BCvsBC.data.PS.sub <- fastinR::select_vars(BCvsBC.data.PS, FAS_BC_PS)
 par(mfrow=c(2,1))
 dataplot(BCvsBC.data.PS)
 dataplot(BCvsBC.data.PS.sub)
@@ -350,7 +350,7 @@ plot.pop_props(BCvsBC.data.PS.mod$res,save=F,density=F,types = 'post')
 
 ```{r}
 
-BCvsBC.data.WP.sub <- fastinR::select_vars(BCvsBC.data.WP, FAS_BC_WP[1:6])
+BCvsBC.data.WP.sub <- fastinR::select_vars(BCvsBC.data.WP, FAS_BC_WP)
 par(mfrow=c(2,1))
 dataplot(BCvsBC.data.WP.sub)
 dataplot(BCvsBC.data.WP)
@@ -421,7 +421,7 @@ FAS <- which(colnames(KF.data.PS$datas.FA$preds.FA) %in% c('18_1n9c',
                                                            '24_1n9',
                                                            '18_3n3'))
 
-KF.data.PS.sub <- fastinR::select_vars(KF.data.PS, FAS[1:6])
+KF.data.PS.sub <- fastinR::select_vars(KF.data.PS, FAS)
 par(mfrow=c(2,1))
 dataplot(KF.data.PS)
 dataplot(KF.data.PS.sub)
@@ -450,7 +450,7 @@ FAS <- which(colnames(KF.data.WP$datas.FA$preds.FA) %in% c('18_1n9c',
                                                            '16_0'
                                                            ))
 
-KF.data.WP.sub <- fastinR::select_vars(KF.data.WP, FAS[1:6])
+KF.data.WP.sub <- fastinR::select_vars(KF.data.WP, FAS)
 par(mfrow=c(2,1))
 dataplot(KF.data.WP.sub)
 dataplot(KF.data.WP)
@@ -518,14 +518,15 @@ FAS <- which(colnames(AC.data.PS$datas.FA$preds.FA) %in% c('18_1n9c',
                                                            '22_6n3',
                                                            '24_0',
                                                            '16_0',
-                                                           '18_1n7',
                                                            '18_0',
                                                            '16_1n7'#,
+                                                            #'18_1n7',
+                                                           #'17_0',
                                                            #'22_0',
                                                            #'18_1n9t'
                                                            ))
 
-AC.data.PS.sub <- fastinR::select_vars(AC.data.PS, FAS[1:6])
+AC.data.PS.sub <- fastinR::select_vars(AC.data.PS, FAS)
 par(mfrow=c(2,1))
 dataplot(AC.data.PS)
 dataplot(AC.data.PS.sub)
@@ -551,13 +552,13 @@ FAS <- which(colnames(AC.data.WP$datas.FA$preds.FA) %in% c('18_1n9c',
                                                            '22_6n3',
                                                            '16_1n7',
                                                            '16_0',
-                                                           '18_0'#,
-                                                           #'18_0',
-                                                           #'22_0',
+                                                           '18_0'
+                                                           #'17_0',
+                                                           #'22_0'
                                                            #'18_1n9t'
                                                            ))
 
-AC.data.WP.sub <- fastinR::select_vars(AC.data.WP, FAS[1:6])
+AC.data.WP.sub <- fastinR::select_vars(AC.data.WP, FAS)
 par(mfrow=c(2,1))
 dataplot(AC.data.WP.sub)
 dataplot(AC.data.WP)
