@@ -6,7 +6,8 @@ require(aws.s3)
 s3load('GoM_tracers.Rdata', 
        bucket = 'gom-diets',
        key = 'AKIARYTPAP6R2SC2FEOT',
-       secret = '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')
+       secret = 'PG5e2NWDPVz1ld20J37ePcoiC1Kpi0AjVrdmSLKA',
+       show_progress = T)
 
 diet_props <- lapply(modlist, function(l) {
   props <- rstan::extract(l$mod,pars='prop')$prop
