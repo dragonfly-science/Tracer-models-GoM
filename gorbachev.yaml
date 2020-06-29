@@ -1,4 +1,4 @@
 docker: docker.dragonfly.co.nz/gommies
 publish: GoM-analysis
-memory: 16
+memory: 32
 cpus: 16

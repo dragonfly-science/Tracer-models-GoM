@@ -5,6 +5,8 @@ output:
     code_fold: hide
     toc: yes
     toc_float: true
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r setup, echo=F, message=FALSE, warning=FALSE}
@@ -79,7 +81,7 @@ PP %<>% mutate(`EwE group` = ifelse(!is.na(`EwE group`), `EwE group`, `Species`)
 bluecrab_cc <- read_csv('data/calibration_coefficient_summary_d84.csv')
 
 ggplot(bluecrab_cc) + 
-  geom_pointrange(aes(x=FA, y=avg_CC, ymax=avg_CC+SD_CC, ymin=avg_CC-SD_CC, col=diet)) + 
+  geom_pointrange(aes(x=FA, y=avg_CC, ymax=avg_CC+SD_CC, ymin=avg_CC-SD_CC, col=diet,shape=tissue)) + 
   scale_y_log10() + 
   cowplot::theme_cowplot() + 
   geom_hline(yintercept = 1, linetype=3) + 
@@ -115,6 +117,54 @@ ggplot(final_CC) +
   ylab("Conv. Coeff.") + 
   theme(axis.text.x = element_text(angle=45,hjust=1))
 
+### Killifish ####
+
+
+killifish_cc <- read_csv('data/calibration_coefficient_summary_12w.csv')
+
+ggplot(killifish_cc) + 
+  geom_pointrange(aes(x=FA, y=avg_CC, ymax=avg_CC+SD_CC, ymin=avg_CC-SD_CC, col=diet,shape=tissue)) + 
+  scale_y_log10() + 
+  cowplot::theme_cowplot() + 
+  geom_hline(yintercept = 1, linetype=3) + 
+  ylab("Conv. Coeff.") + 
+  theme(axis.text.x = element_text(angle=45,hjust=1),
+        panel.grid.major.x = element_line(linetype = 3),
+        panel.grid.minor.x = element_line(linetype = 3))
+
+final_CC_KF <- killifish_cc %>% 
+  mutate(FA = sub(".","",FA),
+    FA = sub("\\.","_",FA),     
+    FA = gsub("\\.","",FA),     
+    FA = gsub("-","",FA),
+    FA = sub("trans","t",FA),
+    FA = sub("cis","c",FA)) %>%
+  group_by(FA) %>%
+  mutate(FAC = weighted.mean(avg_CC, w=SD_CC,na.rm=T) < 20) %>%
+  group_by(FA,diet,tissue) %>%
+  #nest() %>%
+  mutate(FAL = any(grepl(FA, colnames(PP)[FA_cols]))) %>%
+  filter(FAC, FAL) %>%
+  mutate(FAS = grep(FA, colnames(PP)[FA_cols],value = T)) %>%
+  group_by(FAS) %>%
+  summarise(avg_CC = weighted.mean(avg_CC, w=SD_CC,na.rm=T),
+            SD_CC = mean(SD_CC),na.rm=T) %>%
+  mutate(FA = factor(FAS, levels = colnames(PP)[FA_cols])) %>%
+  complete(FA, fill = list(avg_CC = 1,
+                           SD_CC  = 5)) %>%
+  select(-FAS)
+
+
+ggplot(final_CC_KF) + 
+  geom_pointrange(aes(x=FA, y=avg_CC, ymax=qgamma(0.95,shape = avg_CC^2/SD_CC^2, rate = avg_CC/SD_CC^2), ymin=qgamma(0.05,shape = avg_CC^2/SD_CC^2, rate = avg_CC/SD_CC^2))) + 
+  #scale_y_log10() + 
+  cowplot::theme_cowplot() + 
+  geom_hline(yintercept = 1, linetype=3) + 
+  ylab("Conv. Coeff.") + 
+  theme(axis.text.x = element_text(angle=45,hjust=1))
+
+
+#### Croaker ######
 
 croaker_cc <- read_csv('data/calibration_coefficient_croaker.csv')
 
@@ -122,6 +172,7 @@ ggplot(croaker_cc) +
   geom_pointrange(aes(x=FA, y=Muscle, ymax=Muscle+SD, ymin=Muscle-SD)) + 
   scale_y_log10() + 
   cowplot::theme_cowplot() + 
+  scale_y_log10() + 
   geom_hline(yintercept = 1, linetype=3) + 
   ylab("Conv. Coeff.") + 
   theme(axis.text.x = element_text(angle=45,hjust=1))
@@ -144,7 +195,8 @@ Croaker_CC %<>%
 
 
 cc_list <- list('Blue Crab' = final_CC,
-                'Atlantic croaker' = Croaker_CC)
+                'Atlantic croaker' = Croaker_CC,
+                'Killifish' = final_CC_KF)
 
 
 bind_rows(cc_list, .id = 'Predator') %>%
@@ -379,7 +431,9 @@ KF_PS_pred <- PP %>% filter(Predator == 'Killifish',
 KF_PS_prey <- get_prey(Pred = 'Killifish', Site = 'PS') %>% filter(!grepl('Menhaden',prey.ix))
 
 KF.data.PS <- add_FA(FA.predators = as.matrix(KF_PS_pred[, FA_cols]),
-                     FA.preys     = data.frame(KF_PS_prey[,c(which(colnames(PP)=='prey.ix'),FA_cols)]))
+                     FA.preys     = data.frame(KF_PS_prey[,c(which(colnames(PP)=='prey.ix'),FA_cols)]),
+                     CC.mean = cc_list$`Killifish`$avg_CC,
+                     CC.var  = cc_list$`Killifish`$SD_CC)
 
 
 KF.data.PS <- add_SI(SI.predators = as.matrix(KF_PS_pred[, SI_cols]),
@@ -396,7 +450,9 @@ KF_WP_pred <- PP %>% filter(Predator == 'Killifish',
 KF_WP_prey <- get_prey(Pred = 'Killifish', Site = 'WP') %>% filter(!grepl('Menhaden',prey.ix))
 
 KF.data.WP <- add_FA(FA.predators = as.matrix(KF_WP_pred[, FA_cols]),
-                     FA.preys     = data.frame(KF_WP_prey[,c(which(colnames(PP)=='prey.ix'),FA_cols)]))
+                     FA.preys     = data.frame(KF_WP_prey[,c(which(colnames(PP)=='prey.ix'),FA_cols)]),
+                     CC.mean = cc_list$`Killifish`$avg_CC,
+                     CC.var  = cc_list$`Killifish`$SD_CC)
 
 
 KF.data.WP <- add_SI(SI.predators = as.matrix(KF_WP_pred[, SI_cols]),
@@ -415,11 +471,12 @@ FAS <- which(colnames(KF.data.PS$datas.FA$preds.FA) %in% c('18_1n9c',
                                                            '16_1n7',
                                                            '22_6n3',
                                                            '16_0',
-                                                           '18_1n7',
+                                                           #'18_1n7',
                                                            '18_0',
                                                            '24_0',
                                                            '24_1n9',
-                                                           '18_3n3'))
+                                                           #'18_3n3'
+                                                           ))
 
 KF.data.PS.sub <- fastinR::select_vars(KF.data.PS, FAS)
 par(mfrow=c(2,1))
@@ -441,14 +498,14 @@ plot.pop_props(KF.data.PS.mod$res,save=F,density=F, type='post')
 
 ```{r}
 FAS <- which(colnames(KF.data.WP$datas.FA$preds.FA) %in% c('18_1n9c',
-                                                           '18_3n3',
+                                                           '24_1n9',
                                                            '22_6n3',
                                                            '16_1n7',
                                                            '18_1n7',
                                                            '18_0',
                                                            '24_0',
                                                            '16_0'
-                                                           ))
+))
 
 KF.data.WP.sub <- fastinR::select_vars(KF.data.WP, FAS)
 par(mfrow=c(2,1))
@@ -520,7 +577,7 @@ FAS <- which(colnames(AC.data.PS$datas.FA$preds.FA) %in% c('18_1n9c',
                                                            '16_0',
                                                            '18_0',
                                                            '16_1n7'#,
-                                                            #'18_1n7',
+                                                           #'18_1n7',
                                                            #'17_0',
                                                            #'22_0',
                                                            #'18_1n9t'
