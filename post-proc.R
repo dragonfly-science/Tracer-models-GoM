@@ -26,6 +26,12 @@ draw_diets <- function(diets, predator, nsamples){
   tidyr::pivot_wider(out, names_from = Prey, values_from = value)[,-c(1,2)]
 }
 
+mean_diet_props <- lapply(modlist, function(l) {
+  props <- rstan::get_posterior_mean(l$mod,pars='prop')
+  props <- data.frame(Prey=l$prey,Props = props[,ncol(props)])
+}) %>% bind_rows(.id = 'Species')
+
+rownames(mean_diet_props) <- NULL
 
 #############################################
 ############ Now draw diet proportions   ####
