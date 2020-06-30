@@ -37,6 +37,7 @@ rownames(mean_diet_props) <- NULL
 ############ Now draw diet proportions   ####
 #############################################
 
+mean_diet_props 
 
 # Note, each line is 1 sample = sums to 1
 draw_diets(diet_props, 'Blue crab PS',        nsamples = 100)

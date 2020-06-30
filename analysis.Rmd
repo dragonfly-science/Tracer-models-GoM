@@ -474,7 +474,7 @@ FAS <- which(colnames(KF.data.PS$datas.FA$preds.FA) %in% c('18_1n9c',
                                                            #'18_1n7',
                                                            '18_0',
                                                            '24_0',
-                                                           '24_1n9',
+                                                           '24_1n9'#,
                                                            #'18_3n3'
                                                            ))
 
