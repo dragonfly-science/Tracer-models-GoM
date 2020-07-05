@@ -469,12 +469,12 @@ KF.data.WP <- add_SI(SI.predators = as.matrix(KF_WP_pred[, SI_cols]),
 
 FAS <- which(colnames(KF.data.PS$datas.FA$preds.FA) %in% c('18_1n9c',
                                                            '16_1n7',
-                                                           '22_6n3',
+                                                           #'22_6n3',
                                                            '16_0',
                                                            '18_1n7',
                                                            '18_0',
-                                                           '24_0',
-                                                           '24_1n9',
+                                                           #'24_0',
+                                                           #'24_1n9',
                                                            '18_3n3',
                                                            '18_1n9t'
                                                            ))
@@ -499,12 +499,12 @@ plot.pop_props(KF.data.PS.mod$res,save=F,density=F, type='post')
 
 ```{r}
 FAS <- which(colnames(KF.data.WP$datas.FA$preds.FA) %in% c('18_1n9c',
-                                                           '24_1n9',
-                                                           '22_6n3',
+                                                           #'24_1n9',
+                                                           #'22_6n3',
                                                            '16_1n7',
                                                            '18_1n7',
                                                            '18_0',
-                                                           '24_0',
+                                                           #'24_0',
                                                            '16_0',
                                                            '18_3n3',
                                                            '18_1n9t' 
