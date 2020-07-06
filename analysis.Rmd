@@ -208,8 +208,8 @@ cc_list <- list('Blue Crab' = final_CC,
 
 bind_rows(cc_list, .id = 'Predator') %>%
   ggplot() + 
-  geom_point(aes(x=FA, y=avg_CC, col=Predator)) + 
-  geom_linerange(aes(x=FA, y=avg_CC, ymax=qgamma(0.95,shape = avg_CC^2/SD_CC^2, rate = avg_CC/SD_CC^2), ymin=qgamma(0.05,shape = avg_CC^2/SD_CC^2, rate = avg_CC/SD_CC^2), col=Predator), linetype=3) + 
+  geom_point(aes(x=FA, y=avg_CC, col=Predator), position = position_dodge(0.3)) + 
+  geom_linerange(aes(x=FA, y=avg_CC, ymax=qgamma(0.95,shape = avg_CC^2/SD_CC^2, rate = avg_CC/SD_CC^2), ymin=qgamma(0.05,shape = avg_CC^2/SD_CC^2, rate = avg_CC/SD_CC^2), col=Predator), position = position_dodge(0.3)) + 
   cowplot::theme_cowplot() + 
   scale_y_log10() + 
   geom_hline(yintercept = 1, linetype=3) + 
@@ -338,7 +338,7 @@ FAS_BC_PS <- which(colnames(BCvsBC.data.PS$datas.FA$preds.FA) %in% c('18_1n9c',
                                                                      '22_6n3',
                                                                      '16_1n7',
                                                                      '16_0',
-                                                                     '18_1n9t',
+                                                                     #'18_1n9t',
                                                                      '18_1n7',
                                                                      '18_0',
                                                                      '18_3n6'))
@@ -368,7 +368,7 @@ FAS_BC_WP <- which(colnames(BCvsBC.data.WP$datas.FA$preds.FA) %in% c('18_1n9c',
                                                                      '16_1n7',
                                                                      '16_0',
                                                                      '18_0',
-                                                                     '18_1n9t',
+                                                                     #'18_1n9t',
                                                                      '18_1n7'))
 
 BC.data.WP.sub <- fastinR::select_vars(BC.data.WP, FAS_BC_WP)
@@ -538,203 +538,203 @@ plot.pop_props(KF.data.WP.mod$res,save=F,density = F)
 
 ```
 
-<!-- # Atlantic Croaker -->
+# Atlantic Croaker
 
-<!-- ```{r} -->
+```{r}
 
-<!-- AC_PS_pred <- PP %>% filter(Predator == 'Atlantic Croaker', -->
-<!--                             PP == 'Pred', -->
-<!--                             gr_site=='PS') -->
+FA_cols_AC <- !cc_list$`Atlantic croaker`$SD_CC>0.5
 
-<!-- AC_PS_prey <- get_prey(Pred = 'Atlantic Croaker', Site = 'PS') -->
+AC_PS_pred <- PP %>% filter(Predator == 'Atlantic Croaker',
+                            PP == 'Pred',
+                            gr_site=='PS')
 
-<!-- AC.data.PS <- add_FA(FA.predators = as.matrix(AC_PS_pred[, FA_cols]), -->
-<!--                      FA.preys     = data.frame(AC_PS_prey[,c(which(colnames(PP)=='prey.ix'),FA_cols)]), -->
-<!--                      CC.mean = cc_list$`Atlantic croaker`$avg_CC, -->
-<!--                      CC.var  = cc_list$`Atlantic croaker`$SD_CC) -->
+AC_PS_prey <- get_prey(Pred = 'Atlantic Croaker', Site = 'PS')
 
-
-<!-- AC.data.PS <- add_SI(SI.predators = as.matrix(AC_PS_pred[, SI_cols]), -->
-<!--                      SI.preys     = data.frame(AC_PS_prey[,c(which(colnames(PP)=='prey.ix'),SI_cols)]), -->
-<!--                      FC.mean = c(-0.5, 1), -->
-<!--                      FC.var  = c(1, 1), -->
-<!--                      datas=AC.data.PS) -->
+AC.data.PS <- add_FA(FA.predators = as.matrix(AC_PS_pred[, FA_cols[FA_cols_AC]]),
+                     FA.preys     = data.frame(AC_PS_prey[,c(which(colnames(PP)=='prey.ix'),FA_cols[FA_cols_AC])]),
+                     CC.mean = cc_list$`Atlantic croaker`$avg_CC[FA_cols_AC],
+                     CC.var  = cc_list$`Atlantic croaker`$SD_CC[FA_cols_AC])
 
 
-<!-- AC_WP_pred <- PP %>% filter(Predator == 'Atlantic Croaker', -->
-<!--                             PP == 'Pred', -->
-<!--                             gr_site=='WP') -->
-
-<!-- AC_WP_prey <- get_prey(Pred = 'Atlantic Croaker', Site = 'WP') -->
-
-<!-- AC.data.WP <- add_FA(FA.predators = as.matrix(AC_WP_pred[, FA_cols]), -->
-<!--                      FA.preys     = data.frame(AC_WP_prey[,c(which(colnames(PP)=='prey.ix'),FA_cols)]), -->
-<!--                      CC.mean = cc_list$`Atlantic croaker`$avg_CC, -->
-<!--                      CC.var  = cc_list$`Atlantic croaker`$SD_CC) -->
+AC.data.PS <- add_SI(SI.predators = as.matrix(AC_PS_pred[, SI_cols]),
+                     SI.preys     = data.frame(AC_PS_prey[,c(which(colnames(PP)=='prey.ix'),SI_cols)]),
+                     FC.mean = c(-0.5, 1),
+                     FC.var  = c(1, 1),
+                     datas=AC.data.PS)
 
 
-<!-- AC.data.WP <- add_SI(SI.predators = as.matrix(AC_WP_pred[, SI_cols]), -->
-<!--                      SI.preys     = data.frame(AC_WP_prey[,c(which(colnames(PP)=='prey.ix'),SI_cols)]), -->
-<!--                      FC.mean = c(-0.5, 1), -->
-<!--                      FC.var  = c(1, 1), -->
-<!--                      datas=AC.data.WP) -->
+AC_WP_pred <- PP %>% filter(Predator == 'Atlantic Croaker',
+                            PP == 'Pred',
+                            gr_site=='WP')
 
-<!-- ``` -->
+AC_WP_prey <- get_prey(Pred = 'Atlantic Croaker', Site = 'WP')
 
-<!-- ## Atlantic Croaker Model -->
-<!-- ### Atlantic Croaker PS -->
-<!-- ```{r model2} -->
-
-
-<!-- FAS <- which(colnames(AC.data.PS$datas.FA$preds.FA) %in% c('18_1n9c', -->
-<!--                                                            '22_6n3', -->
-<!--                                                            '24_0', -->
-<!--                                                            '16_0', -->
-<!--                                                            '18_0', -->
-<!--                                                            '16_1n7'#, -->
-<!--                                                            #'18_1n7', -->
-<!--                                                            #'17_0', -->
-<!--                                                            #'22_0', -->
-<!--                                                            #'18_1n9t' -->
-<!--                                                            )) -->
-
-<!-- AC.data.PS.sub <- fastinR::select_vars(AC.data.PS, FAS) -->
-<!-- par(mfrow=c(2,1)) -->
-<!-- dataplot(AC.data.PS) -->
-<!-- dataplot(AC.data.PS.sub) -->
-
-<!-- FA_args$datas <- AC.data.PS.sub -->
-
-<!-- AC.data.PS.mod <- brms:::eval_silent(do.call(run_MCMC, FA_args), type='message') -->
-<!-- #diagnostics -->
-<!-- MCMCplot(AC.data.PS.mod$res) -->
-<!-- diags(AC.data.PS.mod$res) -->
-<!-- AC.data.PS.mod$res -->
-<!-- plot.pop_props(AC.data.PS.mod$res,save=F,density=F, type='post') -->
-
-<!-- ``` -->
+AC.data.WP <- add_FA(FA.predators = as.matrix(AC_WP_pred[, FA_cols[FA_cols_AC]]),
+                     FA.preys     = data.frame(AC_WP_prey[,c(which(colnames(PP)=='prey.ix'),FA_cols[FA_cols_AC])]),
+                     CC.mean = cc_list$`Atlantic croaker`$avg_CC[FA_cols_AC],
+                     CC.var  = cc_list$`Atlantic croaker`$SD_CC[FA_cols_AC])
 
 
-<!-- ### Atlantic Croaker WP -->
-<!-- ```{r} -->
+AC.data.WP <- add_SI(SI.predators = as.matrix(AC_WP_pred[, SI_cols]),
+                     SI.preys     = data.frame(AC_WP_prey[,c(which(colnames(PP)=='prey.ix'),SI_cols)]),
+                     FC.mean = c(-0.5, 1),
+                     FC.var  = c(1, 1),
+                     datas=AC.data.WP)
+
+```
+
+## Atlantic Croaker Model
+### Atlantic Croaker PS
+```{r model2}
 
 
-<!-- FAS <- which(colnames(AC.data.WP$datas.FA$preds.FA) %in% c('18_1n9c', -->
-<!--                                                            '24_0', -->
-<!--                                                            '22_6n3', -->
-<!--                                                            '16_1n7', -->
-<!--                                                            '16_0', -->
-<!--                                                            '18_0' -->
-<!--                                                            #'17_0', -->
-<!--                                                            #'22_0' -->
-<!--                                                            #'18_1n9t' -->
-<!--                                                            )) -->
+FAS <- which(colnames(AC.data.PS$datas.FA$preds.FA) %in% c('18_1n9c',
+                                                           '22_6n3',
+                                                           #'24_0',
+                                                           '16_0',
+                                                           '18_0',
+                                                           '16_1n7',
+                                                           '18_1n7',
+                                                           '17_0',
+                                                           '18_1n9t'
+                                                           ))
 
-<!-- AC.data.WP.sub <- fastinR::select_vars(AC.data.WP, FAS) -->
-<!-- par(mfrow=c(2,1)) -->
-<!-- dataplot(AC.data.WP.sub) -->
-<!-- dataplot(AC.data.WP) -->
+AC.data.PS.sub <- fastinR::select_vars(AC.data.PS, FAS)
+par(mfrow=c(2,1))
 
-<!-- FA_args$datas <- AC.data.WP.sub -->
+dataplot(AC.data.PS.sub)
+dataplot(AC.data.PS)
 
-<!-- AC.data.WP.mod <-  brms:::eval_silent(do.call(run_MCMC, FA_args), type='message') -->
-<!-- #diagnostics -->
-<!-- MCMCplot(AC.data.WP.mod$res) -->
-<!-- diags(AC.data.WP.mod$res) -->
-<!-- AC.data.WP.mod$res -->
-<!-- plot.pop_props(AC.data.WP.mod$res,save=F,density = F, type='post') -->
+FA_args$datas <- AC.data.PS.sub
 
-<!-- ``` -->
+AC.data.PS.mod <- brms:::eval_silent(do.call(run_MCMC, FA_args), type='message')
+#diagnostics
+MCMCplot(AC.data.PS.mod$res)
+diags(AC.data.PS.mod$res)
+AC.data.PS.mod$res
+plot.pop_props(AC.data.PS.mod$res,save=F,density=F, type='post')
+
+```
+
+
+### Atlantic Croaker WP
+```{r}
+
+
+FAS <- which(colnames(AC.data.WP$datas.FA$preds.FA) %in% c('18_1n9c',
+                                                           '22_6n3',
+                                                           '16_1n7',
+                                                           '18_1n7',
+                                                           '17_0',
+                                                           '22_1n9',
+                                                           '18_1n9t'
+                                                           ))
+
+AC.data.WP.sub <- fastinR::select_vars(AC.data.WP, FAS)
+par(mfrow=c(2,1))
+dataplot(AC.data.WP.sub)
+dataplot(AC.data.WP)
+
+FA_args$datas <- AC.data.WP.sub
+
+AC.data.WP.mod <-  brms:::eval_silent(do.call(run_MCMC, FA_args), type='message')
+#diagnostics
+MCMCplot(AC.data.WP.mod$res)
+diags(AC.data.WP.mod$res)
+AC.data.WP.mod$res
+plot.pop_props(AC.data.WP.mod$res,save=F,density = F, type='post')
+
+```
 
 
 ```{r}
 
-# modlist <- list('Blue crab PS - no BC prey' = list(mod  = BC.data.PS.mod$mod,
-#                                                    prey = BC.data.PS.mod$res$prey.names),
-#                 'Blue crab WPH - no BC prey' = list(mod  = BC.data.WP.mod$mod,
-#                                                     prey = BC.data.WP.mod$res$prey.names),
-#                 'Blue crab PS - with BC prey' = list(mod  = BCvsBC.data.PS.mod$mod,
-#                                                      prey = BCvsBC.data.PS.mod$res$prey.names),
-#                 'Blue crab WPH - with BC prey' = list(mod  = BCvsBC.data.WP.mod$mod,
-#                                                       prey = BCvsBC.data.WP.mod$res$prey.names))
-# 
-# out <- lapply(modlist, function(l) {
-#   props <- rstan::extract(l$mod,pars='prop')$prop
-#   colnames(props) <- l$prey
-#   reshape2::melt(props)
-# }) %>% bind_rows(.id = 'Species')
-# 
-# colnames(out)[2:3] <- c('iter', 'Prey')
-# 
-# out %<>%
-#   mutate(Prey = gsub(' PS','',Prey),
-#          Prey = gsub(' WP','',Prey)) %>%
-#   group_by(Species, Prey) %>%
-#   summarise(m = mean(value),
-#             q11 = quantile(value, 0.025),
-#             q1 = quantile(value, 0.1),
-#             q3 = quantile(value, 0.9),
-#             q33 = quantile(value, 0.975))
-# 
-# ggplot(out) +
-#   geom_pointrange(aes(x=Prey, y=m, ymin=q11, ymax=q33, col=Prey), size=0.5) +
-#   geom_linerange(aes(x=Prey, y=m, ymin=q1, ymax=q3, col=Prey), size=1) +
-#   facet_wrap(~Species, ncol = 2) +
-#   coord_flip() +
-#   cowplot::theme_cowplot() +
-#   scale_color_discrete(guide='none') +
-#   ylab('Prey proportion') +
-#   theme(axis.text.y = element_text(size=8))
+modlist <- list('Blue crab PS - no BC prey' = list(mod  = BC.data.PS.mod$mod,
+                                                   prey = BC.data.PS.mod$res$prey.names),
+                'Blue crab WPH - no BC prey' = list(mod  = BC.data.WP.mod$mod,
+                                                    prey = BC.data.WP.mod$res$prey.names),
+                'Blue crab PS - with BC prey' = list(mod  = BCvsBC.data.PS.mod$mod,
+                                                     prey = BCvsBC.data.PS.mod$res$prey.names),
+                'Blue crab WPH - with BC prey' = list(mod  = BCvsBC.data.WP.mod$mod,
+                                                      prey = BCvsBC.data.WP.mod$res$prey.names))
+
+out <- lapply(modlist, function(l) {
+  props <- rstan::extract(l$mod,pars='prop')$prop
+  colnames(props) <- l$prey
+  reshape2::melt(props)
+}) %>% bind_rows(.id = 'Species')
+
+colnames(out)[2:3] <- c('iter', 'Prey')
+
+out %<>%
+  mutate(Prey = gsub(' PS','',Prey),
+         Prey = gsub(' WP','',Prey)) %>%
+  group_by(Species, Prey) %>%
+  summarise(m = mean(value),
+            q11 = quantile(value, 0.025),
+            q1 = quantile(value, 0.1),
+            q3 = quantile(value, 0.9),
+            q33 = quantile(value, 0.975))
+
+ggplot(out) +
+  geom_pointrange(aes(x=Prey, y=m, ymin=q11, ymax=q33, col=Prey), size=0.5) +
+  geom_linerange(aes(x=Prey, y=m, ymin=q1, ymax=q3, col=Prey), size=1) +
+  facet_wrap(~Species, ncol = 2) +
+  coord_flip() +
+  cowplot::theme_cowplot() +
+  scale_color_discrete(guide='none') +
+  ylab('Prey proportion') +
+  theme(axis.text.y = element_text(size=8))
 
 ```
 
 ```{r}
 
-# modlist <- list('Blue crab PS' = list(mod  = BCvsBC.data.PS.mod$mod,
-#                                       prey = BCvsBC.data.PS.mod$res$prey.names),
-#                 'Blue crab WPH' = list(mod  = BCvsBC.data.WP.mod$mod,
-#                                        prey = BCvsBC.data.WP.mod$res$prey.names),
-#                 'Killifish PS' = list(mod  = KF.data.PS.mod$mod,
-#                                       prey = KF.data.PS.mod$res$prey.names),
-#                 'Killifish WPH' = list(mod  = KF.data.WP.mod$mod,
-#                                        prey = KF.data.WP.mod$res$prey.names),
-#                 'Atlantic Croaker PS' = list(mod  = AC.data.PS.mod$mod,
-#                                              prey = AC.data.PS.mod$res$prey.names),
-#                 'Atlantic Croaker WPH' = list(mod  = AC.data.WP.mod$mod,
-#                                               prey = AC.data.WP.mod$res$prey.names))
-# 
-# out <- lapply(modlist, function(l) {
-#   props <- rstan::extract(l$mod,pars='prop')$prop
-#   colnames(props) <- l$prey
-#   reshape2::melt(props)
-# }) %>% bind_rows(.id = 'Species')
-# 
-# colnames(out)[2:3] <- c('iter', 'Prey')
-# 
-# out %<>%
-#   mutate(Prey = gsub(' PS','',Prey),
-#          Prey = gsub(' WP','',Prey)) %>%
-#   group_by(Species, Prey) %>%
-#   summarise(m = mean(value),
-#             q11 = quantile(value, 0.025),
-#             q1 = quantile(value, 0.1),
-#             q3 = quantile(value, 0.9),
-#             q33 = quantile(value, 0.975))
-# 
-# ggplot(out) +
-#   geom_pointrange(aes(x=Prey, y=m, ymin=q11, ymax=q33, col=Prey), size=0.5) +
-#   geom_linerange(aes(x=Prey, y=m, ymin=q1, ymax=q3, col=Prey), size=1) +
-#   facet_wrap(~Species, ncol = 2, scales = 'free_y') +
-#   coord_flip() +
-#   cowplot::theme_cowplot() +
-#   scale_color_discrete(guide='none') +
-#   ylab('Prey proportion') +
-#   theme(axis.text.y = element_text(size=8))
+modlist <- list('Blue crab PS' = list(mod  = BCvsBC.data.PS.mod$mod,
+                                      prey = BCvsBC.data.PS.mod$res$prey.names),
+                'Blue crab WPH' = list(mod  = BCvsBC.data.WP.mod$mod,
+                                       prey = BCvsBC.data.WP.mod$res$prey.names),
+                'Killifish PS' = list(mod  = KF.data.PS.mod$mod,
+                                      prey = KF.data.PS.mod$res$prey.names),
+                'Killifish WPH' = list(mod  = KF.data.WP.mod$mod,
+                                       prey = KF.data.WP.mod$res$prey.names),
+                'Atlantic Croaker PS' = list(mod  = AC.data.PS.mod$mod,
+                                             prey = AC.data.PS.mod$res$prey.names),
+                'Atlantic Croaker WPH' = list(mod  = AC.data.WP.mod$mod,
+                                              prey = AC.data.WP.mod$res$prey.names))
+
+out <- lapply(modlist, function(l) {
+  props <- rstan::extract(l$mod,pars='prop')$prop
+  colnames(props) <- l$prey
+  reshape2::melt(props)
+}) %>% bind_rows(.id = 'Species')
+
+colnames(out)[2:3] <- c('iter', 'Prey')
+
+out %<>%
+  mutate(Prey = gsub(' PS','',Prey),
+         Prey = gsub(' WP','',Prey)) %>%
+  group_by(Species, Prey) %>%
+  summarise(m = mean(value),
+            q11 = quantile(value, 0.025),
+            q1 = quantile(value, 0.1),
+            q3 = quantile(value, 0.9),
+            q33 = quantile(value, 0.975))
+
+ggplot(out) +
+  geom_pointrange(aes(x=Prey, y=m, ymin=q11, ymax=q33, col=Prey), size=0.5) +
+  geom_linerange(aes(x=Prey, y=m, ymin=q1, ymax=q3, col=Prey), size=1) +
+  facet_wrap(~Species, ncol = 2, scales = 'free_y') +
+  coord_flip() +
+  cowplot::theme_cowplot() +
+  scale_color_discrete(guide='none') +
+  ylab('Prey proportion') +
+  theme(axis.text.y = element_text(size=8))
 
 ```
 
 ```{r}
-#save(out,file = 'GoM_diet_props.Rdata')
+save(out,file = 'GoM_diet_props.Rdata')
 save.image(file = 'GoM_tracers.Rdata')
 ```
 
