@@ -86,11 +86,15 @@ ggplot(bluecrab_cc) +
   cowplot::theme_cowplot() + 
   geom_hline(yintercept = 1, linetype=3) + 
   ylab("Conv. Coeff.") + 
+  xlab("Fatty Acid") + 
+  scale_color_discrete('Diet') + 
+  scale_shape_discrete('Tissue') + 
   theme(axis.text.x = element_text(angle=45,hjust=1),
         panel.grid.major.x = element_line(linetype = 3),
         panel.grid.minor.x = element_line(linetype = 3))
 
 final_CC <- bluecrab_cc %>% 
+  filter(grepl('muscle', tissue)) %>%
   mutate(FA = sub(":","_",FA),
          FA = gsub("-","",FA),
          FA = sub("trans","t",FA),
@@ -119,7 +123,6 @@ ggplot(final_CC) +
 
 ### Killifish ####
 
-
 killifish_cc <- read_csv('data/calibration_coefficient_summary_12w.csv')
 
 ggplot(killifish_cc) + 
@@ -128,19 +131,23 @@ ggplot(killifish_cc) +
   cowplot::theme_cowplot() + 
   geom_hline(yintercept = 1, linetype=3) + 
   ylab("Conv. Coeff.") + 
+  xlab("Fatty Acid") + 
+  scale_color_discrete('Diet') + 
+  scale_shape_discrete('Tissue') + 
   theme(axis.text.x = element_text(angle=45,hjust=1),
         panel.grid.major.x = element_line(linetype = 3),
         panel.grid.minor.x = element_line(linetype = 3))
 
 final_CC_KF <- killifish_cc %>% 
+  filter(grepl('muscle', tissue)) %>%
   mutate(FA = sub(".","",FA),
-    FA = sub("\\.","_",FA),     
-    FA = gsub("\\.","",FA),     
-    FA = gsub("-","",FA),
-    FA = sub("trans","t",FA),
-    FA = sub("cis","c",FA)) %>%
+         FA = sub("\\.","_",FA),     
+         FA = gsub("\\.","",FA),     
+         FA = gsub("-","",FA),
+         FA = sub("trans","t",FA),
+         FA = sub("cis","c",FA)) %>%
   group_by(FA) %>%
-  mutate(FAC = weighted.mean(avg_CC, w=SD_CC,na.rm=T) < 20) %>%
+  mutate(FAC = T) %>%
   group_by(FA,diet,tissue) %>%
   #nest() %>%
   mutate(FAL = any(grepl(FA, colnames(PP)[FA_cols]))) %>%
@@ -157,10 +164,12 @@ final_CC_KF <- killifish_cc %>%
 
 ggplot(final_CC_KF) + 
   geom_pointrange(aes(x=FA, y=avg_CC, ymax=qgamma(0.95,shape = avg_CC^2/SD_CC^2, rate = avg_CC/SD_CC^2), ymin=qgamma(0.05,shape = avg_CC^2/SD_CC^2, rate = avg_CC/SD_CC^2))) + 
-  #scale_y_log10() + 
+  scale_y_log10() + 
   cowplot::theme_cowplot() + 
   geom_hline(yintercept = 1, linetype=3) + 
+  coord_cartesian(ylim=c(0.1,NA)) + 
   ylab("Conv. Coeff.") + 
+  xlab("Fatty Acid") + 
   theme(axis.text.x = element_text(angle=45,hjust=1))
 
 
@@ -170,9 +179,7 @@ croaker_cc <- read_csv('data/calibration_coefficient_croaker.csv')
 
 ggplot(croaker_cc) + 
   geom_pointrange(aes(x=FA, y=Muscle, ymax=Muscle+SD, ymin=Muscle-SD)) + 
-  scale_y_log10() + 
   cowplot::theme_cowplot() + 
-  scale_y_log10() + 
   geom_hline(yintercept = 1, linetype=3) + 
   ylab("Conv. Coeff.") + 
   theme(axis.text.x = element_text(angle=45,hjust=1))
@@ -201,11 +208,14 @@ cc_list <- list('Blue Crab' = final_CC,
 
 bind_rows(cc_list, .id = 'Predator') %>%
   ggplot() + 
-  geom_pointrange(aes(x=FA, y=avg_CC, ymax=qgamma(0.95,shape = avg_CC^2/SD_CC^2, rate = avg_CC/SD_CC^2), ymin=qgamma(0.05,shape = avg_CC^2/SD_CC^2, rate = avg_CC/SD_CC^2), col=Predator)) + 
-  #scale_y_log10() + 
+  geom_point(aes(x=FA, y=avg_CC, col=Predator)) + 
+  geom_linerange(aes(x=FA, y=avg_CC, ymax=qgamma(0.95,shape = avg_CC^2/SD_CC^2, rate = avg_CC/SD_CC^2), ymin=qgamma(0.05,shape = avg_CC^2/SD_CC^2, rate = avg_CC/SD_CC^2), col=Predator), linetype=3) + 
   cowplot::theme_cowplot() + 
+  scale_y_log10() + 
   geom_hline(yintercept = 1, linetype=3) + 
+  coord_cartesian(ylim=c(0.1,NA)) + 
   ylab("Conv. Coeff.") + 
+  xlab("Fatty Acid") + 
   theme(axis.text.x = element_text(angle=45,hjust=1))
 
 
@@ -479,7 +489,7 @@ FAS <- which(colnames(KF.data.PS$datas.FA$preds.FA) %in% c('18_1n9c',
                                                            #'24_1n9',
                                                            '18_3n3',
                                                            '18_1n9t'
-                                                           ))
+))
 
 KF.data.PS.sub <- fastinR::select_vars(KF.data.PS, FAS)
 par(mfrow=c(2,1))
