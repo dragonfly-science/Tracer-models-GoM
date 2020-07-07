@@ -247,7 +247,7 @@ FA_args <- list(nIter=5000,
                 nBurnin=1000,
                 nChains=8,
                 nThin=32,
-                Data.Type='Combined.Analysis',
+                Data.Type='Fatty.Acid.Profiles',
                 Analysis.Type='Population.proportions',
                 Rnot=0.2,plott=F,spawn=F)
 
@@ -269,11 +269,11 @@ BC.data.PS <- add_FA(FA.predators = as.matrix(BC_PS_pred[, FA_cols]),
                      CC.var  = cc_list$`Blue Crab`$SD_CC)
 
 
-BC.data.PS <- add_SI(SI.predators = as.matrix(BC_PS_pred[, SI_cols]),
-                     SI.preys     = data.frame(BC_PS_prey[,c(which(colnames(PP)=='prey.ix'),SI_cols)]),
-                     FC.mean = c(-0.5, 1),
-                     FC.var  = c(1, 1),
-                     datas=BC.data.PS)
+# BC.data.PS <- add_SI(SI.predators = as.matrix(BC_PS_pred[, SI_cols]),
+#                      SI.preys     = data.frame(BC_PS_prey[,c(which(colnames(PP)=='prey.ix'),SI_cols)]),
+#                      FC.mean = c(-0.5, 1),
+#                      FC.var  = c(1, 1),
+#                      datas=BC.data.PS)
 
 
 BC_WP_pred <- PP %>% filter(Predator == 'Blue Crab',
@@ -288,11 +288,11 @@ BC.data.WP <- add_FA(FA.predators = as.matrix(BC_WP_pred[, FA_cols]),
                      CC.var  = cc_list$`Blue Crab`$SD_CC)
 
 
-BC.data.WP <- add_SI(SI.predators = as.matrix(BC_WP_pred[, SI_cols]),
-                     SI.preys     = data.frame(BC_WP_prey[,c(which(colnames(PP)=='prey.ix'),SI_cols)]),
-                     FC.mean = c(-0.5, 1),
-                     FC.var  = c(1, 1),
-                     datas=BC.data.WP)
+# BC.data.WP <- add_SI(SI.predators = as.matrix(BC_WP_pred[, SI_cols]),
+#                      SI.preys     = data.frame(BC_WP_prey[,c(which(colnames(PP)=='prey.ix'),SI_cols)]),
+#                      FC.mean = c(-0.5, 1),
+#                      FC.var  = c(1, 1),
+#                      datas=BC.data.WP)
 
 
 
@@ -304,11 +304,11 @@ BCvsBC.data.PS <- add_FA(FA.predators = as.matrix(BC_PS_pred[, FA_cols]),
                          CC.var  = cc_list$`Blue Crab`$SD_CC)
 
 
-BCvsBC.data.PS <- add_SI(SI.predators = as.matrix(BC_PS_pred[, SI_cols]),
-                         SI.preys     = data.frame(BC_vs_BC_PS_prey[,c(which(colnames(PP)=='prey.ix'),SI_cols)]),
-                         FC.mean = c(-0.5, 1),
-                         FC.var  = c(1, 1),
-                         datas=BCvsBC.data.PS)
+# BCvsBC.data.PS <- add_SI(SI.predators = as.matrix(BC_PS_pred[, SI_cols]),
+#                          SI.preys     = data.frame(BC_vs_BC_PS_prey[,c(which(colnames(PP)=='prey.ix'),SI_cols)]),
+#                          FC.mean = c(-0.5, 1),
+#                          FC.var  = c(1, 1),
+#                          datas=BCvsBC.data.PS)
 
 
 
@@ -320,11 +320,11 @@ BCvsBC.data.WP <- add_FA(FA.predators = as.matrix(BC_WP_pred[, FA_cols]),
                          CC.var  = cc_list$`Blue Crab`$SD_CC)
 
 
-BCvsBC.data.WP <- add_SI(SI.predators = as.matrix(BC_WP_pred[, SI_cols]),
-                         SI.preys     = data.frame(BC_vs_BC_WP_prey[,c(which(colnames(PP)=='prey.ix'),SI_cols)]),
-                         FC.mean = c(-0.5, 1),
-                         FC.var  = c(1, 1),
-                         datas=BCvsBC.data.WP)
+# BCvsBC.data.WP <- add_SI(SI.predators = as.matrix(BC_WP_pred[, SI_cols]),
+#                          SI.preys     = data.frame(BC_vs_BC_WP_prey[,c(which(colnames(PP)=='prey.ix'),SI_cols)]),
+#                          FC.mean = c(-0.5, 1),
+#                          FC.var  = c(1, 1),
+#                          datas=BCvsBC.data.WP)
 
 ```
 
@@ -345,8 +345,9 @@ FAS_BC_PS <- which(colnames(BCvsBC.data.PS$datas.FA$preds.FA) %in% c('18_1n9c',
 
 BC.data.PS.sub <- fastinR::select_vars(BC.data.PS, FAS_BC_PS)
 par(mfrow=c(2,1))
-dataplot(BC.data.PS)
+
 dataplot(BC.data.PS.sub)
+dataplot(BC.data.PS)
 
 FA_args$datas <- BC.data.PS.sub
 BC.data.PS.mod <- brms:::eval_silent(do.call(run_MCMC, FA_args), type='message')
@@ -368,8 +369,10 @@ FAS_BC_WP <- which(colnames(BCvsBC.data.WP$datas.FA$preds.FA) %in% c('18_1n9c',
                                                                      '16_1n7',
                                                                      '16_0',
                                                                      '18_0',
-                                                                     #'18_1n9t',
-                                                                     '18_1n7'))
+                                                                     '18_3n6',
+                                                                     '18_1n7',
+                                                                     '17_0',
+                                                                     '24_0'))
 
 BC.data.WP.sub <- fastinR::select_vars(BC.data.WP, FAS_BC_WP)
 par(mfrow=c(2,1))
@@ -396,8 +399,8 @@ plot(BC.data.PS.mod$mod,pars='cc') + geom_vline(xintercept=qnorm(0.025,1,1), lin
 
 BCvsBC.data.PS.sub <- fastinR::select_vars(BCvsBC.data.PS, FAS_BC_PS)
 par(mfrow=c(2,1))
-dataplot(BCvsBC.data.PS)
 dataplot(BCvsBC.data.PS.sub)
+dataplot(BCvsBC.data.PS)
 
 FA_args$datas <- BCvsBC.data.PS.sub
 BCvsBC.data.PS.mod <- brms:::eval_silent(do.call(run_MCMC, FA_args), type='message')
@@ -435,23 +438,25 @@ plot(BCvsBC.data.PS.mod$mod,pars='cc') + geom_vline(xintercept=qnorm(0.025,1,1),
 
 ```{r}
 
+FA_cols_KF <- !as.character(cc_list$Killifish$FA)>20
+
 KF_PS_pred <- PP %>% filter(Predator == 'Killifish',
                             PP == 'Pred',
                             gr_site=='PS')
 
 KF_PS_prey <- get_prey(Pred = 'Killifish', Site = 'PS') %>% filter(!grepl('Menhaden',prey.ix))
 
-KF.data.PS <- add_FA(FA.predators = as.matrix(KF_PS_pred[, FA_cols]),
-                     FA.preys     = data.frame(KF_PS_prey[,c(which(colnames(PP)=='prey.ix'),FA_cols)]),
-                     CC.mean = cc_list$`Killifish`$avg_CC,
-                     CC.var  = cc_list$`Killifish`$SD_CC)
+KF.data.PS <- add_FA(FA.predators = as.matrix(KF_PS_pred[, FA_cols[FA_cols_KF]]),
+                     FA.preys     = data.frame(KF_PS_prey[,c(which(colnames(PP)=='prey.ix'),FA_cols[FA_cols_KF])]),
+                     CC.mean = cc_list$`Killifish`$avg_CC[FA_cols_KF],
+                     CC.var  = cc_list$`Killifish`$SD_CC[FA_cols_KF])
 
 
-KF.data.PS <- add_SI(SI.predators = as.matrix(KF_PS_pred[, SI_cols]),
-                     SI.preys     = data.frame(KF_PS_prey[,c(which(colnames(PP)=='prey.ix'),SI_cols)]),
-                     FC.mean = c(-0.5, 1),
-                     FC.var  = c(1, 1),
-                     datas=KF.data.PS)
+# KF.data.PS <- add_SI(SI.predators = as.matrix(KF_PS_pred[, SI_cols]),
+#                      SI.preys     = data.frame(KF_PS_prey[,c(which(colnames(PP)=='prey.ix'),SI_cols)]),
+#                      FC.mean = c(-0.5, 1),
+#                      FC.var  = c(1, 1),
+                     # datas=KF.data.PS)
 
 
 KF_WP_pred <- PP %>% filter(Predator == 'Killifish',
@@ -460,17 +465,17 @@ KF_WP_pred <- PP %>% filter(Predator == 'Killifish',
 
 KF_WP_prey <- get_prey(Pred = 'Killifish', Site = 'WP') %>% filter(!grepl('Menhaden',prey.ix))
 
-KF.data.WP <- add_FA(FA.predators = as.matrix(KF_WP_pred[, FA_cols]),
-                     FA.preys     = data.frame(KF_WP_prey[,c(which(colnames(PP)=='prey.ix'),FA_cols)]),
-                     CC.mean = cc_list$`Killifish`$avg_CC,
-                     CC.var  = cc_list$`Killifish`$SD_CC)
+KF.data.WP <- add_FA(FA.predators = as.matrix(KF_WP_pred[, FA_cols[FA_cols_KF]]),
+                     FA.preys     = data.frame(KF_WP_prey[,c(which(colnames(PP)=='prey.ix'),FA_cols[FA_cols_KF])]),
+                     CC.mean = cc_list$`Killifish`$avg_CC[FA_cols_KF],
+                     CC.var  = cc_list$`Killifish`$SD_CC[FA_cols_KF])
 
 
-KF.data.WP <- add_SI(SI.predators = as.matrix(KF_WP_pred[, SI_cols]),
-                     SI.preys     = data.frame(KF_WP_prey[,c(which(colnames(PP)=='prey.ix'),SI_cols)]),
-                     FC.mean = c(-0.5, 1),
-                     FC.var  = c(1, 1),
-                     datas=KF.data.WP)
+# KF.data.WP <- add_SI(SI.predators = as.matrix(KF_WP_pred[, SI_cols]),
+#                      SI.preys     = data.frame(KF_WP_prey[,c(which(colnames(PP)=='prey.ix'),SI_cols)]),
+#                      FC.mean = c(-0.5, 1),
+#                      FC.var  = c(1, 1),
+#                      datas=KF.data.WP)
 
 ```
 
@@ -480,22 +485,17 @@ KF.data.WP <- add_SI(SI.predators = as.matrix(KF_WP_pred[, SI_cols]),
 
 FAS <- which(colnames(KF.data.PS$datas.FA$preds.FA) %in% c('18_1n9c',
                                                            '16_1n7',
-                                                           #'22_6n3',
-                                                           '16_0',
-                                                           '14_0',
-                                                           '17_0',
                                                            '18_1n7',
+                                                           '16_0',
                                                            '18_0',
-                                                           #'24_0',
-                                                           #'24_1n9',
-                                                           '18_3n3',
-                                                           '18_1n9t'
+                                                           '18_1n9t',
+                                                           '18_3n3'
 ))
 
 KF.data.PS.sub <- fastinR::select_vars(KF.data.PS, FAS)
 par(mfrow=c(2,1))
-dataplot(KF.data.PS)
 dataplot(KF.data.PS.sub)
+dataplot(KF.data.PS)
 
 FA_args$datas <- KF.data.PS.sub
 
@@ -512,14 +512,12 @@ plot.pop_props(KF.data.PS.mod$res,save=F,density=F, type='post')
 
 ```{r}
 FAS <- which(colnames(KF.data.WP$datas.FA$preds.FA) %in% c('18_1n9c',
-                                                           '14_0',
                                                            '16_1n7',
                                                            '18_1n7',
-                                                           '18_0',
-                                                           '17_0',
                                                            '16_0',
-                                                           '18_3n3',
-                                                           '18_1n9t' 
+                                                           '18_0',
+                                                           '18_1n9t',
+                                                           '18_3n3'
 ))
 
 KF.data.WP.sub <- fastinR::select_vars(KF.data.WP, FAS)
@@ -542,7 +540,7 @@ plot.pop_props(KF.data.WP.mod$res,save=F,density = F)
 
 ```{r}
 
-FA_cols_AC <- !cc_list$`Atlantic croaker`$SD_CC>0.5
+FA_cols_AC <- cc_list$`Atlantic croaker`$SD_CC>0
 
 AC_PS_pred <- PP %>% filter(Predator == 'Atlantic Croaker',
                             PP == 'Pred',
@@ -556,11 +554,11 @@ AC.data.PS <- add_FA(FA.predators = as.matrix(AC_PS_pred[, FA_cols[FA_cols_AC]])
                      CC.var  = cc_list$`Atlantic croaker`$SD_CC[FA_cols_AC])
 
 
-AC.data.PS <- add_SI(SI.predators = as.matrix(AC_PS_pred[, SI_cols]),
-                     SI.preys     = data.frame(AC_PS_prey[,c(which(colnames(PP)=='prey.ix'),SI_cols)]),
-                     FC.mean = c(-0.5, 1),
-                     FC.var  = c(1, 1),
-                     datas=AC.data.PS)
+# AC.data.PS <- add_SI(SI.predators = as.matrix(AC_PS_pred[, SI_cols]),
+#                      SI.preys     = data.frame(AC_PS_prey[,c(which(colnames(PP)=='prey.ix'),SI_cols)]),
+#                      FC.mean = c(-0.5, 1),
+#                      FC.var  = c(1, 1),
+#                      datas=AC.data.PS)
 
 
 AC_WP_pred <- PP %>% filter(Predator == 'Atlantic Croaker',
@@ -575,11 +573,11 @@ AC.data.WP <- add_FA(FA.predators = as.matrix(AC_WP_pred[, FA_cols[FA_cols_AC]])
                      CC.var  = cc_list$`Atlantic croaker`$SD_CC[FA_cols_AC])
 
 
-AC.data.WP <- add_SI(SI.predators = as.matrix(AC_WP_pred[, SI_cols]),
-                     SI.preys     = data.frame(AC_WP_prey[,c(which(colnames(PP)=='prey.ix'),SI_cols)]),
-                     FC.mean = c(-0.5, 1),
-                     FC.var  = c(1, 1),
-                     datas=AC.data.WP)
+# AC.data.WP <- add_SI(SI.predators = as.matrix(AC_WP_pred[, SI_cols]),
+#                      SI.preys     = data.frame(AC_WP_prey[,c(which(colnames(PP)=='prey.ix'),SI_cols)]),
+#                      FC.mean = c(-0.5, 1),
+#                      FC.var  = c(1, 1),
+#                      datas=AC.data.WP)
 
 ```
 
@@ -590,7 +588,8 @@ AC.data.WP <- add_SI(SI.predators = as.matrix(AC_WP_pred[, SI_cols]),
 
 FAS <- which(colnames(AC.data.PS$datas.FA$preds.FA) %in% c('18_1n9c',
                                                            '22_6n3',
-                                                           #'24_0',
+                                                           '24_0',
+                                                           '22_0',
                                                            '16_0',
                                                            '18_0',
                                                            '16_1n7',
@@ -624,10 +623,11 @@ plot.pop_props(AC.data.PS.mod$res,save=F,density=F, type='post')
 FAS <- which(colnames(AC.data.WP$datas.FA$preds.FA) %in% c('18_1n9c',
                                                            '22_6n3',
                                                            '16_1n7',
-                                                           '18_1n7',
                                                            '17_0',
-                                                           '22_1n9',
-                                                           '18_1n9t'
+                                                           '16_0',
+                                                           '24_0',
+                                                           '22_0',
+                                                           '18_0'
                                                            ))
 
 AC.data.WP.sub <- fastinR::select_vars(AC.data.WP, FAS)
