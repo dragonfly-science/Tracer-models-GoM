@@ -388,7 +388,6 @@ diags(BC.data.WP.mod$res)
 BC.data.WP.mod$res
 plot.pop_props(BC.data.WP.mod$res,save=F,density = F)
 
-plot(BC.data.PS.mod$mod,pars='cc') + geom_vline(xintercept=qnorm(0.025,1,1), linetype=2) + geom_vline(xintercept=qnorm(0.975,1,1), linetype=2)
 ```
 
 ### Blue crab PS with BC prey
@@ -428,9 +427,6 @@ MCMCplot(BCvsBC.data.WP.mod$res)
 diags(BCvsBC.data.WP.mod$res)
 BCvsBC.data.WP.mod$res
 plot.pop_props(BCvsBC.data.WP.mod$res,save=F,density = F)
-
-plot(BCvsBC.data.PS.mod$mod,pars='cc') + geom_vline(xintercept=qnorm(0.025,1,1), linetype=2) + geom_vline(xintercept=qnorm(0.975,1,1), linetype=2)
-
 
 ```
 
