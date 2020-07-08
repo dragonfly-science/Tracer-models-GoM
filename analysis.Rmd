@@ -243,10 +243,10 @@ get_prey <- function(Pred, Site){
 }
 
 
-FA_args <- list(nIter=5000,
-                nBurnin=1000,
+FA_args <- list(nIter=15000,
+                nBurnin=5000,
                 nChains=8,
-                nThin=32,
+                nThin=80,
                 Data.Type='Fatty.Acid.Profiles',
                 Analysis.Type='Population.proportions',
                 Rnot=0.2,plott=F,spawn=F)
@@ -585,13 +585,10 @@ AC.data.WP <- add_FA(FA.predators = as.matrix(AC_WP_pred[, FA_cols[FA_cols_AC]])
 FAS <- which(colnames(AC.data.PS$datas.FA$preds.FA) %in% c('18_1n9c',
                                                            '22_6n3',
                                                            '24_0',
-                                                           '22_0',
                                                            '16_0',
                                                            '18_0',
                                                            '16_1n7',
-                                                           '18_1n7',
-                                                           '17_0',
-                                                           '18_1n9t'
+                                                           '18_1n7'
                                                            ))
 
 AC.data.PS.sub <- fastinR::select_vars(AC.data.PS, FAS)
@@ -619,10 +616,8 @@ plot.pop_props(AC.data.PS.mod$res,save=F,density=F, type='post')
 FAS <- which(colnames(AC.data.WP$datas.FA$preds.FA) %in% c('18_1n9c',
                                                            '22_6n3',
                                                            '16_1n7',
-                                                           '17_0',
                                                            '16_0',
                                                            '24_0',
-                                                           '22_0',
                                                            '18_0'
                                                            ))
 
