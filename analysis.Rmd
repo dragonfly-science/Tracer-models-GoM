@@ -447,7 +447,7 @@ KF_PS_prey <- get_prey(Pred = 'Killifish', Site = 'PS') %>% filter(!grepl('Menha
 KF.data.PS <- add_FA(FA.predators = as.matrix(KF_PS_pred[, FA_cols[FA_cols_KF]]),
                      FA.preys     = data.frame(KF_PS_prey[,c(which(colnames(PP)=='prey.ix'),FA_cols[FA_cols_KF])]),
                      CC.mean = cc_list$`Killifish`$avg_CC[FA_cols_KF],
-                     CC.var  = cc_list$`Killifish`$SD_CC^2[FA_cols_KF])
+                     CC.var  = cc_list$`Killifish`$SD_CC[FA_cols_KF]^2)
 
 
 # KF.data.PS <- add_SI(SI.predators = as.matrix(KF_PS_pred[, SI_cols]),
@@ -466,7 +466,7 @@ KF_WP_prey <- get_prey(Pred = 'Killifish', Site = 'WP') %>% filter(!grepl('Menha
 KF.data.WP <- add_FA(FA.predators = as.matrix(KF_WP_pred[, FA_cols[FA_cols_KF]]),
                      FA.preys     = data.frame(KF_WP_prey[,c(which(colnames(PP)=='prey.ix'),FA_cols[FA_cols_KF])]),
                      CC.mean = cc_list$`Killifish`$avg_CC[FA_cols_KF],
-                     CC.var  = cc_list$`Killifish`$SD_CC^2[FA_cols_KF])
+                     CC.var  = cc_list$`Killifish`$SD_CC[FA_cols_KF]^2)
 
 
 # KF.data.WP <- add_SI(SI.predators = as.matrix(KF_WP_pred[, SI_cols]),
