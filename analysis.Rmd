@@ -243,10 +243,10 @@ get_prey <- function(Pred, Site){
 }
 
 
-FA_args <- list(nIter=2000,
-                nBurnin=1000,
+FA_args <- list(nIter=12000,
+                nBurnin=2000,
                 nChains=16,
-                nThin=16,
+                nThin=160,
                 Data.Type='Fatty.Acid.Profiles',
                 Analysis.Type='Population.proportions',
                 Rnot=0.2,plott=F,spawn=F)
@@ -341,9 +341,7 @@ FAS_BC_PS <- which(colnames(BCvsBC.data.PS$datas.FA$preds.FA) %in% c('18_1n9c',
                                                                      #'18_1n9t',
                                                                      '18_1n7',
                                                                      '18_0',
-                                                                     '18_3n6',
-                                                                     '14_0',
-                                                                     '17_0'))
+                                                                     '18_3n6'))
 
 BC.data.PS.sub <- fastinR::select_vars(BC.data.PS, FAS_BC_PS)
 par(mfrow=c(2,1))
@@ -371,10 +369,7 @@ FAS_BC_WP <- which(colnames(BCvsBC.data.WP$datas.FA$preds.FA) %in% c('18_1n9c',
                                                                      '16_1n7',
                                                                      '16_0',
                                                                      '18_0',
-                                                                     '18_3n6',
-                                                                     '18_1n7',
-                                                                     '17_0',
-                                                                     '24_0'))
+                                                                     '18_1n7'))
 
 BC.data.WP.sub <- fastinR::select_vars(BC.data.WP, FAS_BC_WP)
 par(mfrow=c(2,1))
