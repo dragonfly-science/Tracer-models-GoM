@@ -3,10 +3,13 @@
 require(dplyr)
 require(aws.s3)
 
+key = 
+secret = 
+  
 s3load('GoM_tracers.Rdata', 
        bucket = 'gom-diets',
-       key = 'AKIARYTPAP6R2SC2FEOT',
-       secret = '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',
+       key = 
+       secret = 
        show_progress = T)
 
 diet_props <- lapply(modlist, function(l) {
