@@ -1,16 +1,12 @@
 #### Setup #####
 
 require(dplyr)
-require(aws.s3)
 
-key = 
-secret = 
-  
-s3load('GoM_tracers.Rdata', 
-       bucket = 'gom-diets',
-       key = 
-       secret = 
-       show_progress = T)
+curl::curl_download('https://gom-diets.s3.amazonaws.com/GoM_tracers.Rdata', 
+                    destfile = 'GoM_tracers.Rdata',
+                    quiet = F)
+
+load('GoM_tracers.Rdata')
 
 diet_props <- lapply(modlist, function(l) {
   props <- rstan::extract(l$mod,pars='prop')$prop
