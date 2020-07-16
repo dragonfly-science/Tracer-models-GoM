@@ -243,10 +243,10 @@ get_prey <- function(Pred, Site){
 }
 
 
-FA_args <- list(nIter=12000,
-                nBurnin=2000,
+FA_args <- list(nIter=25000,
+                nBurnin=5000,
                 nChains=16,
-                nThin=160,
+                nThin=320,
                 Data.Type='Fatty.Acid.Profiles',
                 Analysis.Type='Population.proportions',
                 Rnot=0.2,plott=F,spawn=F)
@@ -269,11 +269,11 @@ BC.data.PS <- add_FA(FA.predators = as.matrix(BC_PS_pred[, FA_cols]),
                      CC.var  = cc_list$`Blue Crab`$SD_CC^2)
 
 
-# BC.data.PS <- add_SI(SI.predators = as.matrix(BC_PS_pred[, SI_cols]),
-#                      SI.preys     = data.frame(BC_PS_prey[,c(which(colnames(PP)=='prey.ix'),SI_cols)]),
-#                      FC.mean = c(-0.5, 1),
-#                      FC.var  = c(1, 1),
-#                      datas=BC.data.PS)
+BC.data.PS <- add_SI(SI.predators = as.matrix(BC_PS_pred[, SI_cols]),
+                     SI.preys     = data.frame(BC_PS_prey[,c(which(colnames(PP)=='prey.ix'),SI_cols)]),
+                     FC.mean = c(-0.5, 1),
+                     FC.var  = c(1, 1),
+                     datas=BC.data.PS)
 
 
 BC_WP_pred <- PP %>% filter(Predator == 'Blue Crab',
@@ -288,11 +288,11 @@ BC.data.WP <- add_FA(FA.predators = as.matrix(BC_WP_pred[, FA_cols]),
                      CC.var  = cc_list$`Blue Crab`$SD_CC^2)
 
 
-# BC.data.WP <- add_SI(SI.predators = as.matrix(BC_WP_pred[, SI_cols]),
-#                      SI.preys     = data.frame(BC_WP_prey[,c(which(colnames(PP)=='prey.ix'),SI_cols)]),
-#                      FC.mean = c(-0.5, 1),
-#                      FC.var  = c(1, 1),
-#                      datas=BC.data.WP)
+BC.data.WP <- add_SI(SI.predators = as.matrix(BC_WP_pred[, SI_cols]),
+                     SI.preys     = data.frame(BC_WP_prey[,c(which(colnames(PP)=='prey.ix'),SI_cols)]),
+                     FC.mean = c(-0.5, 1),
+                     FC.var  = c(1, 1),
+                     datas=BC.data.WP)
 
 
 
