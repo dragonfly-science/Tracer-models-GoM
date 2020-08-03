@@ -261,7 +261,8 @@ BC_PS_pred <- PP %>% filter(Predator == 'Blue Crab',
                             PP == 'Pred',
                             gr_site=='PS')
 
-BC_PS_prey <- get_prey(Pred = 'Blue Crab', Site = 'PS') %>% filter(!grepl('Blue crabs',prey.ix))
+BC_PS_prey <- get_prey(Pred = 'Blue Crab', Site = 'PS') %>% filter(!grepl('Blue crabs',prey.ix),
+                                                                   !grepl('Mullet',prey.ix))
 
 BC.data.PS <- add_FA(FA.predators = as.matrix(BC_PS_pred[, FA_cols]),
                      FA.preys     = data.frame(BC_PS_prey[,c(which(colnames(PP)=='prey.ix'),FA_cols)]),
@@ -280,7 +281,8 @@ BC_WP_pred <- PP %>% filter(Predator == 'Blue Crab',
                             PP == 'Pred',
                             gr_site=='WP')
 
-BC_WP_prey <- get_prey(Pred = 'Blue Crab', Site = 'WP') %>% filter(!grepl('Blue crabs',prey.ix))
+BC_WP_prey <- get_prey(Pred = 'Blue Crab', Site = 'WP')  %>% filter(!grepl('Blue crabs',prey.ix),
+                                                                   !grepl('Mullet',prey.ix))
 
 BC.data.WP <- add_FA(FA.predators = as.matrix(BC_WP_pred[, FA_cols]),
                      FA.preys     = data.frame(BC_WP_prey[,c(which(colnames(PP)=='prey.ix'),FA_cols)]),
@@ -296,7 +298,7 @@ BC.data.WP <- add_SI(SI.predators = as.matrix(BC_WP_pred[, SI_cols]),
 
 
 
-BC_vs_BC_PS_prey <- get_prey(Pred = 'Blue Crab', Site = 'PS')
+BC_vs_BC_PS_prey <- get_prey(Pred = 'Blue Crab', Site = 'PS') %>% filter(!grepl('Mullet',prey.ix))
 
 BCvsBC.data.PS <- add_FA(FA.predators = as.matrix(BC_PS_pred[, FA_cols]),
                          FA.preys     = data.frame(BC_vs_BC_PS_prey[,c(which(colnames(PP)=='prey.ix'),FA_cols)]),
@@ -312,7 +314,7 @@ BCvsBC.data.PS <- add_SI(SI.predators = as.matrix(BC_PS_pred[, SI_cols]),
 
 
 
-BC_vs_BC_WP_prey <- get_prey(Pred = 'Blue Crab', Site = 'WP')
+BC_vs_BC_WP_prey <- get_prey(Pred = 'Blue Crab', Site = 'WP') %>% filter(!grepl('Mullet',prey.ix))
 
 BCvsBC.data.WP <- add_FA(FA.predators = as.matrix(BC_WP_pred[, FA_cols]),
                          FA.preys     = data.frame(BC_vs_BC_WP_prey[,c(which(colnames(PP)=='prey.ix'),FA_cols)]),
