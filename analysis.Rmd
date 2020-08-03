@@ -724,7 +724,7 @@ ggplot(out) +
 
 ```{r}
 save(out,file = 'GoM_diet_props.Rdata')
-save.image(file = 'GoM_tracers.Rdata')
+save.image(file = 'GoM_tracers_rmMullet.Rdata')
 ```
 
 
